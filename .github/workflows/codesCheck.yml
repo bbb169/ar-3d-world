@@ -1,0 +1,34 @@
+name: deploy pvp-texas-poker
+
+on:
+  push:
+    branches:
+      - "*" # for any branch
+    paths:
+      - ".github/workflows/*"
+      - "app/**"
+      - "components/*"
+      - "package.json"
+      - "tsconfig.json"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: get codes
+        uses: actions/checkout@v3
+
+      - name: set node environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.15.0"
+
+      - name: install dependencies
+        run: npm install
+
+      - name: eslint check
+        run: npm run lint
+
+      - name: test cases
+        run: npm run test
