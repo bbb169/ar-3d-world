@@ -10,6 +10,16 @@ export const homePageStyles = StyleSheet.create({
     position: 'relative',
   },
 
+  bottomStick: {
+    position: 'absolute',
+    width: '100%',
+    bottom: 10,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+  },
+
   canvasView: {
     width: '100%',
     height: '100%',
