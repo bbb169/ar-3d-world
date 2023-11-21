@@ -7,6 +7,7 @@ import XYZGrid from '../../component/XYZGrid';
 import { homePageStyles } from './style';
 import FixedControlCameraButtons from './component';
 import Cube from '../../component/cube';
+import { cameraLookAt } from './component/hooks';
 
 export default function HomePage(): React.JSX.Element {
   const [OrbitControls, events] = useControls();
@@ -27,7 +28,7 @@ export default function HomePage(): React.JSX.Element {
             <XYZGrid isXYZ="isZ" />
           </Suspense>
 
-          <OrbitControls />
+          <OrbitControls enablePan={false} target={cameraLookAt}/>
         </Canvas>
       </View>
       {/* <EditScreenInfo path="app/pages/home/index.tsx" /> */}
