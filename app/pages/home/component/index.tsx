@@ -17,7 +17,7 @@ export default function FixedControlCameraButtons({
   const [frameAnimation, setFrameAnimation] = useState<any>(null);
 
   useEffect(() => {
-    camera.lookAt(cameraLookAt);
+    camera.lookAt(0, 0, 0);
     camera.position.set(20, 20, 20);
   }, []);
 
