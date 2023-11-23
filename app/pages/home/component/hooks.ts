@@ -23,7 +23,7 @@ export default function getMoveCamera(): [Vector3, ({ frontBackDis, leftRightDis
     console.log('pos', changPosition);
 
     const cameraUnitVector = new Vector3(0, 0, -1).applyMatrix4(cameraMatrix).normalize();
-    const newCameraLookAt = cameraLookAt.clone();
+    const newCameraLookAt = changPosition ? cameraLookAt.clone() : cameraLookAt.clone().normalize();
 
     if (frontBackDis) {
       // move some distance in this direction
