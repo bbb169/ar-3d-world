@@ -5,7 +5,7 @@ import { Button } from '@rneui/base';
 import { PerspectiveCamera } from 'three';
 import { GestureHandlerRootView  } from 'react-native-gesture-handler';
 import KorolJoystick from '../../../component/joystick';
-import { moveCamera } from './hooks';
+import { cameraLookAt, moveCamera } from './hooks';
 
 /* float buttons to control zoom of 3d camera */
 export default function FixedControlCameraButtons({
@@ -17,7 +17,7 @@ export default function FixedControlCameraButtons({
   const [frameAnimation, setFrameAnimation] = useState<any>(null);
 
   useEffect(() => {
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(cameraLookAt);
     camera.position.set(20, 20, 20);
   }, []);
 
