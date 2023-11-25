@@ -64,7 +64,7 @@ export default function moveCamera({
   const cameraMatrix = new Matrix4();
   cameraMatrix.copy(camera.matrixWorld);
 
-  const cameraUnitVector = new Vector3(0, 0, -1).applyMatrix4(cameraMatrix).normalize();
+  const cameraUnitVector = cameraLookAt.clone().negate().normalize();
   const newCameraLookAt = cameraLookAt.clone();
 
   if (frontBackDis) {

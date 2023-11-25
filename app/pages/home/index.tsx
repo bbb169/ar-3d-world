@@ -9,7 +9,7 @@ import Cube from '../../component/cube';
 import { getRotateCamera } from './controlCamera';
 
 export default function HomePage(): React.JSX.Element {
-  const cameraRef = useRef<PerspectiveCamera>(new PerspectiveCamera());
+  const cameraRef = useRef<PerspectiveCamera>(new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 20000));
   const camera = cameraRef.current;
   const [rotateCameraEvents] = useState(getRotateCamera(camera));
 
@@ -22,7 +22,7 @@ export default function HomePage(): React.JSX.Element {
         style={homePageStyles.canvasView}
         {...rotateCameraEvents}
       >
-        <Canvas scene={{ background: new Color('black') }} camera={camera}>
+        <Canvas scene={{ background: new Color('0xbfd1e5') }} camera={camera}>
           <Suspense fallback={null}>
             <Cube position={[1, 1, 1]} />
             <XYZGrid isXYZ="isX" />
