@@ -6,7 +6,7 @@ import XYZGrid from '../../component/XYZGrid';
 import { homePageStyles } from './style';
 import FixedControlCameraButtons from './component';
 import Cube from '../../component/cube';
-import { getRotateCamera } from './rotateCamera';
+import { getRotateCamera } from './controlCamera';
 
 export default function HomePage(): React.JSX.Element {
   const cameraRef = useRef<PerspectiveCamera>(new PerspectiveCamera());
