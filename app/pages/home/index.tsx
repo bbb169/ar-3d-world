@@ -1,12 +1,13 @@
 import React, { Suspense, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { Color, PerspectiveCamera } from 'three';
+import { Color, PerspectiveCamera, Vector3 } from 'three';
 import { Canvas } from '@react-three/fiber/native';
 import XYZGrid from '../../component/XYZGrid';
 import { homePageStyles } from './style';
 import FixedControlCameraButtons from './component';
 import Cube from '../../component/cube';
 import { getRotateCamera } from './controlCamera';
+import { MineCraftGround } from '../../utils/buildScene';
 
 export default function HomePage(): React.JSX.Element {
   const cameraRef = useRef<PerspectiveCamera>(new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 20000));
@@ -28,6 +29,8 @@ export default function HomePage(): React.JSX.Element {
             <XYZGrid isXYZ="isX" />
             <XYZGrid isXYZ="isY" />
             <XYZGrid isXYZ="isZ" />
+            <MineCraftGround />
+            <directionalLight args={[0xffffff, 12]} position={new Vector3(1, 1, 0.5).normalize()}/>
           </Suspense>
         </Canvas>
       </View>
