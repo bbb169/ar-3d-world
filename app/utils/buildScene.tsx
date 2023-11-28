@@ -1,21 +1,14 @@
-import { BufferGeometry, DoubleSide, Matrix4, Mesh, MeshLambertMaterial, NearestFilter, PlaneGeometry, SRGBColorSpace, Texture, TextureLoader } from 'three';
+import { DoubleSide, Matrix4, MeshLambertMaterial, NearestFilter, PlaneGeometry, SRGBColorSpace, Vector3 } from 'three';
 import { ImprovedNoise } from 'three/examples/jsm/math/ImprovedNoise.js';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { Asset } from 'expo-asset';
-import { useEffect, useState } from 'react';
+import { TextureLoader } from 'expo-three';
 
-
-const localImage = Asset.loadAsync(require('../../assets/textures/atlas.png'));
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const texture = new TextureLoader().load(require('../../assets/textures/atlas.png'));
+texture.colorSpace = SRGBColorSpace;
+texture.magFilter = NearestFilter;
 
 export function MineCraftGround() {
-	const [imageUri, setImageUri] = useState('');
-
-	useEffect(() => {
-		localImage.then((result) => {
-			setImageUri(result[0].uri);
-		});
-	}, []);
-
   const worldWidth = 128;
   const worldDepth = 128;
 	const worldHalfWidth = worldWidth / 2;
@@ -91,18 +84,11 @@ export function MineCraftGround() {
 
 	const geometry = BufferGeometryUtils.mergeBufferGeometries(geometries);
 	geometry.computeBoundingSphere();
+	const meterial = new MeshLambertMaterial({ map: texture, side: DoubleSide });
 
-	let texture = new Texture();
-
-	if (localImage.downloaded) {
-		texture = new TextureLoader().load(imageUri);
-		texture.colorSpace = SRGBColorSpace;
-		texture.magFilter = NearestFilter;
-	}
-
-
-	return <mesh geometry={geometry}>
-		<meshLambertMaterial map={texture} side={DoubleSide} attach="material" color="yellow" />
+	return <mesh geometry={geometry} material={meterial} >
+		<ambientLight color={0xeeeeee} intensity={3} />
+		<directionalLight color={0xffffff} intensity={12} position={new Vector3(1, 1, 0.5).normalize()}/>
 	</mesh>;
 
   function generateHeight(width: number, height: number) {

@@ -23,7 +23,7 @@ export default function HomePage(): React.JSX.Element {
         style={homePageStyles.canvasView}
         {...rotateCameraEvents}
       >
-        <Canvas scene={{ background: new Color('0xbfd1e5') }} camera={camera}>
+        <Canvas scene={{ background: new Color(0xbfd1e5) }} camera={camera}>
           <Suspense fallback={null}>
             <Cube position={[1, 1, 1]} />
             <XYZGrid isXYZ="isX" />

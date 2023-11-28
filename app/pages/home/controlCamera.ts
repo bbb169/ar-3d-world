@@ -1,7 +1,7 @@
 import { Dimensions, GestureResponderEvent } from 'react-native';
 import { Matrix4, PerspectiveCamera, Spherical, Vector3 } from 'three';
 
-const spherical = new Spherical(100, Math.PI * 3 / 4, Math.PI * 5 / 4);
+const spherical = new Spherical(100000, Math.PI * 3 / 4, Math.PI * 5 / 4);
 const cameraLookAt = new Vector3().set(20, 20, 20).setFromSpherical(spherical);
 
 export function getRotateCamera(camera: PerspectiveCamera) {
@@ -26,7 +26,16 @@ export function getRotateCamera(camera: PerspectiveCamera) {
 
       spherical.theta += Math.PI * deltaX / height;
       spherical.phi -= Math.PI * deltaY / height;
-      spherical.makeSafe();
+      console.log(spherical.phi, spherical.theta, camera.position);
+      // if (spherical.phi < 0) {
+      //   spherical.phi = 0;
+      //   spherical.theta += Math.PI / 2;
+      // }
+      // if (spherical.theta > Math.PI) {
+      //   spherical.theta -= Math.PI;
+      // }
+
+      // spherical.makeSafe();
 
       // get a ball coordinate centered on the camera's position
       // and set its spherical, this will make rotate camera being smoothly.
@@ -90,7 +99,7 @@ export default function moveCamera({
   camera.lookAt(cameraLookAt);
 
   // make camera won't out range
-  camera.position.set(Math.max(10, camera.position.x), Math.max(10, camera.position.y), Math.max(10, camera.position.z));
+  // camera.position.set(Math.max(10, camera.position.x), Math.max(10, camera.position.y), Math.max(10, camera.position.z));
   camera.updateProjectionMatrix();
 }
 
