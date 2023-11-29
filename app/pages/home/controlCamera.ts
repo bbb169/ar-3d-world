@@ -26,16 +26,11 @@ export function getRotateCamera(camera: PerspectiveCamera) {
 
       spherical.theta += Math.PI * deltaX / height;
       spherical.phi -= Math.PI * deltaY / height;
-      console.log(spherical.phi, spherical.theta, camera.position);
-      // if (spherical.phi < 0) {
-      //   spherical.phi = 0;
-      //   spherical.theta += Math.PI / 2;
-      // }
-      // if (spherical.theta > Math.PI) {
-      //   spherical.theta -= Math.PI;
-      // }
 
-      // spherical.makeSafe();
+      // two PI is one circle, this won't change direction,just make theta won't be too large
+      if (spherical.theta > Math.PI * 2) {
+        spherical.theta -= Math.PI * 2;
+      }
 
       // get a ball coordinate centered on the camera's position
       // and set its spherical, this will make rotate camera being smoothly.
@@ -72,13 +67,14 @@ export default function moveCamera({
 }: MoveCameraProps) {
   const cameraMatrix = new Matrix4();
   cameraMatrix.copy(camera.matrixWorld);
+  const sensity = 10;
 
   const cameraUnitVector = cameraLookAt.clone().negate().normalize();
   const newCameraLookAt = cameraLookAt.clone();
 
   if (frontBackDis) {
     // move some distance in this direction
-    camera.position.addScaledVector(cameraUnitVector, frontBackDis);
+    camera.position.addScaledVector(cameraUnitVector, frontBackDis * sensity);
   }
 
   if (leftRightDis) {
@@ -86,13 +82,13 @@ export default function moveCamera({
     const cameraLeftRightUnitVector = new Vector3().crossVectors(new Vector3(0, 1, 0), cameraUnitVector);
 
     // we need move camera lookAt and position, this make user's perspective won't be changed
-    newCameraLookAt.addScaledVector(cameraLeftRightUnitVector, leftRightDis);
-    camera.position.addScaledVector(cameraLeftRightUnitVector, leftRightDis);
+    newCameraLookAt.addScaledVector(cameraLeftRightUnitVector, leftRightDis * sensity);
+    camera.position.addScaledVector(cameraLeftRightUnitVector, leftRightDis * sensity);
   }
 
   if (upDownDis) {
-    camera.position.addScaledVector(new Vector3(0, 1, 0), upDownDis);
-    newCameraLookAt.addScaledVector(new Vector3(0, 1, 0), upDownDis);
+    camera.position.addScaledVector(new Vector3(0, 1, 0), upDownDis * sensity);
+    newCameraLookAt.addScaledVector(new Vector3(0, 1, 0), upDownDis * sensity);
   }
 
   cameraLookAt.copy(newCameraLookAt);
