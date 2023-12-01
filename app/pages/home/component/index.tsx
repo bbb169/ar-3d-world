@@ -1,11 +1,11 @@
 import { View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { fixedButtonsStyles, homePageStyles } from '../style';
-import { Button } from '@rneui/base';
 import { PerspectiveCamera } from 'three';
 import { GestureHandlerRootView  } from 'react-native-gesture-handler';
 import KorolJoystick from '../../../component/joystick';
 import moveCamera, { cameraLookAt } from '../controlCamera';
+import IconButton from '../../../component/iconButton';
 
 /* float buttons to control zoom of 3d camera */
 export default function FixedControlCameraButtons({
@@ -41,25 +41,35 @@ export default function FixedControlCameraButtons({
   return (
     <>
       <View style={fixedButtonsStyles(2).style}>
-        <Button
-          onPressIn={() => {
-            setStartMove(-1);
+        <IconButton
+          buttonProps={{
+            onPressIn: () => {
+              setStartMove(-1);
+            },
+            onPressOut: () => {
+              setStartMove(0);
+            },
           }}
-          onPressOut={() => {
-            setStartMove(0);
+          iconProps= {{
+            name: 'downcircleo',
+            size: 36,
           }}
-          title="-"
         />
       </View>
       <View style={fixedButtonsStyles(1).style}>
-        <Button
-          onPressIn={() => {
-            setStartMove(1);
+        <IconButton
+          buttonProps={{
+            onPressIn: () => {
+              setStartMove(1);
+            },
+            onPressOut: () => {
+              setStartMove(0);
+            },
           }}
-          onPressOut={() => {
-            setStartMove(0);
+          iconProps= {{
+            name: 'upcircleo',
+            size: 36,
           }}
-          title="+"
         />
       </View>
       <GestureHandlerRootView style={homePageStyles.bottomStick}>

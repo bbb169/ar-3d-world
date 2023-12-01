@@ -61,11 +61,9 @@ export const fixedButtonsStyles = (level = 1, left = false) => {
   return StyleSheet.create({
     style: {
       position: 'absolute',
-      top: level * 50,
-      height: 32,
-      width: 32,
-      borderRadius: 32,
-      overflow: 'hidden',
+      top: level * 60,
+      height: 36,
+      width: 36,
       zIndex: 999,
       ...postionStyle,
     },
