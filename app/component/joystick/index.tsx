@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 import * as utils from './utils';
-import { Gesture, GestureDetector, GestureStateChangeEvent, GestureTouchEvent } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, GestureTouchEvent } from 'react-native-gesture-handler';
 import { joystickStyles } from './style';
 
 interface JoystickUpdateEvent {
@@ -33,6 +33,7 @@ const KorolJoystick: React.FC<Props> = (props) => {
 
   const [x, setX] = useState(wrapperRadius - nippleRadius);
   const [y, setY] = useState(wrapperRadius - nippleRadius);
+  const moveIntervalRef = useRef<number>();
 
   const handleTouchMove = useMemo(() => {
     let timerLimit = false;
@@ -84,8 +85,8 @@ const KorolJoystick: React.FC<Props> = (props) => {
       setX(coordinates.x);
       setY(coordinates.y);
 
-      onMove &&
-        onMove({
+      const triggerMove = () => {
+        onMove && onMove({
           position: {
             x: (coordinates.x - 50) / 75,
             y: (coordinates.y - 50) / 75,
@@ -97,14 +98,24 @@ const KorolJoystick: React.FC<Props> = (props) => {
           force,
           type: 'move',
         });
+      };
+
+      triggerMove();
+
+      clearInterval(moveIntervalRef.current);
+      moveIntervalRef.current = setInterval(() => {
+        triggerMove();
+      }, 1) as unknown as number;
     };
 
     return move;
   }, []);
 
-  const handleTouchEnd = (e: GestureStateChangeEvent<any>) => {
+  const handleTouchEnd = () => {
     setX(wrapperRadius - nippleRadius);
     setY(wrapperRadius - nippleRadius);
+
+    clearInterval(moveIntervalRef.current);
     onStop &&
       onStop({
         force: 0,
@@ -120,7 +131,7 @@ const KorolJoystick: React.FC<Props> = (props) => {
       });
   };
 
-  const handleTouchStart = (e: GestureStateChangeEvent<any>) => {
+  const handleTouchStart = () => {
     onStart &&
       onStart({
         force: 0,
@@ -136,13 +147,13 @@ const KorolJoystick: React.FC<Props> = (props) => {
       });
   };
 
-  const panGesture = useRef(Gesture.Pan()
+  const panGesture = Gesture.Pan()
+  .onTouchesMove(handleTouchMove)
   .onStart(handleTouchStart)
-  .onEnd(handleTouchEnd)
-  .onTouchesMove(handleTouchMove));
+  .onEnd(handleTouchEnd);
 
   return (
-    <GestureDetector gesture={panGesture.current}>
+    <GestureDetector gesture={panGesture}>
       <View
         style={[
           {
