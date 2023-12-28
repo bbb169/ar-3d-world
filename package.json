@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
+    "@react-native-community/netinfo": "^11.2.1",
     "@react-navigation/native": "^6.0.2",
     "@react-three/fiber": "^8.15.9",
     "@rneui/base": "^4.0.0-rc.7",
@@ -39,6 +40,7 @@
     "react-native-safe-area-context": "4.6.3",
     "react-native-screens": "~3.22.0",
     "react-native-web": "~0.19.6",
+    "socket.io-client": "^4.7.2",
     "three": "^0.145.0"
   },
   "devDependencies": {

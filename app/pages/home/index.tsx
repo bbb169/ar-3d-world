@@ -6,11 +6,13 @@ import { homePageStyles } from './style';
 import FixedControlCameraButtons from './component';
 import { getRotateCamera } from './controlCamera';
 import { MineCraftGround } from '../../component/mineCraftGround';
+import useInfosFromSocket from './hooks/useWebsocket';
 
 export default function HomePage(): React.JSX.Element {
   const cameraRef = useRef<PerspectiveCamera>(new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 20000));
   const camera = cameraRef.current;
   const [rotateCameraEvents] = useState(getRotateCamera(camera));
+  useInfosFromSocket();
 
   return (
     <View style={homePageStyles.wholeView}>
