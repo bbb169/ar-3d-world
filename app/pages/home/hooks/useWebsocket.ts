@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import NetInfo from '@react-native-community/netinfo';
 
+type ResolveValue<T> = T extends Record<string, any> ? [keyof T, T[keyof T]] : never;
+
+type EmitSocketParams = (...props: ResolveValue<{
+    'threeFingerSwitchWindow': 'left' | 'right';
+}>) => void
+
 export default function useInfosFromSocket () {
     const [socket, setSocket] = useState<Socket | void>();
     const [wifiIpAddress, setWifiIpAddress] = useState<string | null>(null);
@@ -21,14 +27,16 @@ export default function useInfosFromSocket () {
                 }
             });
         } else if (!socket && wifiIpAddress) {
-            console.log(`http://172.25.141.242:${3000}`);
-            setSocket(io(`http://172.25.141.242:${3000}`));
+            console.log(`http://${__DEV__ === true ? '172.25.141.242' : wifiIpAddress}:${3000}`);
+            setSocket(io(`http://${__DEV__ === true ? '172.25.141.242' : wifiIpAddress}:${3000}`));
         } else if (socket && wifiIpAddress) {
             console.log(socket.connected);
 
             // client-side
             socket.on('connect', () => {
-                console.log('connetct');
+                console.log('connetct', socket.connected);
+                const emitSocket = socket.emit as EmitSocketParams;
+                emitSocket('threeFingerSwitchWindow', 'right');
             });
 
             socket.on('disconnect', () => {
