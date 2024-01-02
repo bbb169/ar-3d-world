@@ -2,6 +2,8 @@ import { StyleSheet, ImageStyle } from 'react-native';
 
 const wholeViewStyle: ImageStyle = {
   flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
 };
 
 export const homePageStyles = StyleSheet.create({
