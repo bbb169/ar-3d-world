@@ -10,9 +10,9 @@ type EmitSocket = (...props: ResolveValue<{
 
 type SocketState = 'STOP' | 'STARED' | 'CONNECTED' | 'DISCONNECTED';
 
-export default function useInfosFromSocket (): [SocketState, Socket | void] {
+export default function useInfosFromSocket (): [SocketState, Socket | void, string] {
     const [socket, setSocket] = useState<Socket | void>();
-    const [wifiIpAddress, setWifiIpAddress] = useState<string | null>(null);
+    const [wifiIpAddress, setWifiIpAddress] = useState<string>('');
     const [socketState, setSocketState] = useState<SocketState>('STOP');
 
 
@@ -56,5 +56,5 @@ export default function useInfosFromSocket (): [SocketState, Socket | void] {
         }
     }, [socket, wifiIpAddress]);
 
-    return [socketState, socket];
+    return [socketState, socket, (__DEV__ === true ? '172.25.141.242' : wifiIpAddress)];
 }

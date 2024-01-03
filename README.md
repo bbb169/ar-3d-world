@@ -1,4 +1,4 @@
-# ar-3d-world
+# touch-panel-emulator-mobile
 
 This is a 3D shared space based on react native, threejs, expo, and web3. Players can acquire a certain amount of space and freely create in their own space, as well as perform AR3D scanning to add 3D entities.
 
@@ -27,13 +27,13 @@ after that run the below command
 ```
 npm run build
 ```
-![image](https://github.com/bbb169/ar-3d-world/assets/102608263/bb5c9c5c-2a37-4ee4-88f7-e5fe7c54ec4a)
+![image](https://github.com/bbb169/touch-panel-emulator-mobile/assets/102608263/bb5c9c5c-2a37-4ee4-88f7-e5fe7c54ec4a)
 
 then ctrl+click link show in terminal
 ## Contribution
 you can add my we-chat to get into my grounp, my wechat is Aking_bbb.
 or you can just read some details in https://docs.qq.com/aio/DWnV2cVhjcFdPc3B3
 
-## ar-3d-world
+## touch-panel-emulator-mobile
 
-ar-3d-world is released under the MIT license.
+touch-panel-emulator-mobile is released under the MIT license.
