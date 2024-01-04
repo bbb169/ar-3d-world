@@ -9,6 +9,10 @@ export function initSocket(newSocket: Socket) {
 
 export function emitSocket(...params:ResolveValue<{
     'threeFingerSwitchWindow': 'left' | 'right' | 'top' | 'add' | 'minus';
+    'moveMouse': {
+        left: number
+        top: number
+      }
 }>) {
     if (socket) {
         socket.emit(...params);

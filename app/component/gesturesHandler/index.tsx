@@ -31,8 +31,12 @@ function calculateDirection(angle: number): Direction {
     return 'left';
 }
 
-export function GesturesHandler({ children }: { children: ReactNode }) {
-    const [gestures, setGestures] = useState<string[]>([]);
+export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHandler }: {
+    children: ReactNode,
+    setIsCloseGestureHandler: (value: boolean) => void,
+    /** 控制鼠标灵敏度 */
+    sensitivity?: number
+}) {
     const [positionDiff, setPositionDiff] = useState<{
       /** total moved distance in X axis */
       totalX: number;
@@ -60,6 +64,13 @@ export function GesturesHandler({ children }: { children: ReactNode }) {
 
                 const diffX = !first ? nativeEvent.absoluteX - positionDiff.X : 0;
                 const diffY = !first ? nativeEvent.absoluteY - positionDiff.Y : 0;
+
+                if (positionDiff.startFingers === 1) {
+                    console.log('moveMouse', diffX, diffY);
+
+                    emitSocket('moveMouse', { left: diffY * sensitivity, top: -diffX * sensitivity });
+                }
+
                 setPositionDiff({
                     totalX: totalX + diffX,
                     totalY: totalY + diffY,
@@ -69,20 +80,7 @@ export function GesturesHandler({ children }: { children: ReactNode }) {
                 });
             };
 
-            if (nativeEvent.state === State.BEGAN) {
-                // 获取触摸点的数量
-                const numberOfTouches = nativeEvent.numberOfPointers;
-                // 如果触摸点的数量为3，表示三指滑动
-                if (numberOfTouches >= 3) {
-                    // 处理三指滑动手势事件
-                    setGestures(Array.from(new Set(gestures).add('Three Finger Swipe')));
-                } else {
-                    setGestures(Array.from(new Set(gestures).add('Pan')));
-                }
-                // console.log('BEGAN', positionDiff);
-
-                calculatePosition();
-            } else if (nativeEvent.state === State.ACTIVE) {
+            if (nativeEvent.state === State.ACTIVE) {
                 // console.log('ACTIVE', positionDiff);
                 calculatePosition();
             }
@@ -90,10 +88,13 @@ export function GesturesHandler({ children }: { children: ReactNode }) {
         onHandlerStateChange={({ nativeEvent }) => {
             // console.log(nativeEvent.state, positionDiff.startFingers);
             if (nativeEvent.state === State.END) {
+                // ============  threeFingerSwitchWindow ================
                 if (positionDiff.startFingers === 3) {
                     const direction = calculateDirection(calculateAngle(positionDiff.totalX, positionDiff.totalY));
                     if (direction !== 'bottom') {
                         emitSocket('threeFingerSwitchWindow', direction);
+                    } else {
+                        setIsCloseGestureHandler(true);
                     }
                 }
                 setPositionDiff({
@@ -103,7 +104,6 @@ export function GesturesHandler({ children }: { children: ReactNode }) {
                     Y: 0,
                     startFingers: 0,
                   });
-                setGestures([]);
             }
         }}
     >{children}</PanGestureHandler>;

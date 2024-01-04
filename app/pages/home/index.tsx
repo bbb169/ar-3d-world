@@ -1,30 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import { homePageStyles } from './style';
 import useInfosFromSocket from './hooks/useWebsocket';
 import IconButton from '../../component/iconButton';
 import { GesturesHandler } from '../../component/gesturesHandler';
 import { emitSocket } from '../../utils/socket';
+import { Slider } from '@rneui/base';
 
 export default function HomePage(): React.JSX.Element {
   const [socketState, wifiIpAddress] = useInfosFromSocket();
+  const [mouseSensitivity, setMouseSensitivity] = useState(1);
+  const [isCloseGestureHandler, setIsCloseGestureHandler] = useState(false);
+
+  const mainContent = <View style={homePageStyles.wholeView}>
+    <Text>
+      {socketState}
+    </Text>
+    <Text>
+      use three finger to scroll down will close controll of computer
+    </Text>
+    <Text>
+      wifiIpAddress: {wifiIpAddress}
+    </Text>
+    {isCloseGestureHandler && <>
+      <IconButton buttonProps={{
+      title: 'click to open gestures handler',
+      style: { backgroundColor: 'rgba(78, 116, 289, 1)' },
+      onPress() {
+        setIsCloseGestureHandler(false);
+      },
+    }} />
+    <View>
+      <Text>change mouse sensitivity: {mouseSensitivity.toFixed(2)}</Text>
+      <Slider
+        value={mouseSensitivity}
+        onValueChange={setMouseSensitivity}
+        maximumValue={10}
+        minimumValue={1}
+        step={0.2}
+        trackStyle={{ height: 5, backgroundColor: 'blue' }}
+        allowTouchTrack
+      />
+    </View>
+    </>}
+  </View>;
 
   return (
-    <GesturesHandler>
-      <View style={homePageStyles.wholeView}>
-        <Text>
-          {socketState}
-        </Text>
-        <Text>
-          wifiIpAddress: {wifiIpAddress}
-        </Text>
-        <IconButton buttonProps={{
-          title: 'click to send message',
-          onPress() {
-            emitSocket('threeFingerSwitchWindow', 'right');
-          },
-        }} />
-      </View>
+    isCloseGestureHandler ? mainContent : <GesturesHandler
+      sensitivity={mouseSensitivity}
+      setIsCloseGestureHandler={setIsCloseGestureHandler}
+    >
+      {mainContent}
     </GesturesHandler>
   );
 }
