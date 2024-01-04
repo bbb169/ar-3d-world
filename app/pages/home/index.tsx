@@ -4,10 +4,11 @@ import { homePageStyles } from './style';
 import useInfosFromSocket from './hooks/useWebsocket';
 import IconButton from '../../component/iconButton';
 import { GesturesHandler } from '../../component/gesturesHandler';
+import { emitSocket } from '../../utils/socket';
 
 export default function HomePage(): React.JSX.Element {
-  const [socketState, socket, wifiIpAddress] = useInfosFromSocket();
-  
+  const [socketState, wifiIpAddress] = useInfosFromSocket();
+
   return (
     <GesturesHandler>
       <View style={homePageStyles.wholeView}>
@@ -20,9 +21,7 @@ export default function HomePage(): React.JSX.Element {
         <IconButton buttonProps={{
           title: 'click to send message',
           onPress() {
-            if (socket) {
-              socket.emit('threeFingerSwitchWindow', 'right');
-            }
+            emitSocket('threeFingerSwitchWindow', 'right');
           },
         }} />
       </View>

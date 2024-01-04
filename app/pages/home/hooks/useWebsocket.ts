@@ -1,16 +1,11 @@
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import NetInfo from '@react-native-community/netinfo';
-
-type ResolveValue<T> = T extends Record<string, any> ? [keyof T, T[keyof T]] : never;
-
-type EmitSocket = (...props: ResolveValue<{
-    'threeFingerSwitchWindow': 'left' | 'right';
-}>) => void
+import { initSocket } from '../../../utils/socket';
 
 type SocketState = 'STOP' | 'STARED' | 'CONNECTED' | 'DISCONNECTED';
 
-export default function useInfosFromSocket (): [SocketState, Socket | void, string] {
+export default function useInfosFromSocket (): [SocketState, string] {
     const [socket, setSocket] = useState<Socket | void>();
     const [wifiIpAddress, setWifiIpAddress] = useState<string>('');
     const [socketState, setSocketState] = useState<SocketState>('STOP');
@@ -35,7 +30,7 @@ export default function useInfosFromSocket (): [SocketState, Socket | void, stri
             setSocketState('STARED');
         } else if (socket && wifiIpAddress) {
             console.log(socket.connected);
-
+            initSocket(socket);
             // client-side
             socket.on('connect', () => {
                 console.log('connetct', socket.connected);
@@ -56,5 +51,5 @@ export default function useInfosFromSocket (): [SocketState, Socket | void, stri
         }
     }, [socket, wifiIpAddress]);
 
-    return [socketState, socket, (__DEV__ === true ? '172.25.141.242' : wifiIpAddress)];
+    return [socketState, (__DEV__ === true ? '172.25.141.242' : wifiIpAddress)];
 }

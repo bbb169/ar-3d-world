@@ -1,6 +1,7 @@
 import React, { ReactNode, useState } from 'react';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { Direction } from '../../../constants/type';
+import { emitSocket } from '../../utils/socket';
 
 // 计算射线角度的函数
 function calculateAngle(x: number, y: number) {
@@ -41,19 +42,21 @@ export function GesturesHandler({ children }: { children: ReactNode }) {
       X: number;
       /** last position */
       Y: number;
+      startFingers: number;
     }>({
       totalX: 0,
       totalY: 0,
       X: 0,
       Y: 0,
+      startFingers: 0,
     });
 
 
     return <PanGestureHandler
         onGestureEvent={({ nativeEvent }) => {
             const calculatePosition = () => {
-                const { totalX, totalY, X, Y } = positionDiff;
-                const first = totalX === 0 && totalY === 0 && X === 0 && Y === 0;
+                const { totalX, totalY, startFingers} = positionDiff;
+                const first = startFingers === 0;
 
                 const diffX = !first ? nativeEvent.absoluteX - positionDiff.X : 0;
                 const diffY = !first ? nativeEvent.absoluteY - positionDiff.Y : 0;
@@ -62,6 +65,7 @@ export function GesturesHandler({ children }: { children: ReactNode }) {
                     totalY: totalY + diffY,
                     X: nativeEvent.absoluteX,
                     Y: nativeEvent.absoluteY,
+                    startFingers: positionDiff.startFingers !== 0  ? positionDiff.startFingers : nativeEvent.numberOfPointers,
                 });
             };
 
@@ -81,24 +85,23 @@ export function GesturesHandler({ children }: { children: ReactNode }) {
             } else if (nativeEvent.state === State.ACTIVE) {
                 // console.log('ACTIVE', positionDiff);
                 calculatePosition();
-            } else if (nativeEvent.state === State.CANCELLED) {
-                setPositionDiff({
-                  totalX: 0,
-                  totalY: 0,
-                  X: 0,
-                  Y: 0,
-                });
             }
         }}
         onHandlerStateChange={({ nativeEvent }) => {
+            // console.log(nativeEvent.state, positionDiff.startFingers);
             if (nativeEvent.state === State.END) {
-                console.log('END', positionDiff, calculateDirection(calculateAngle(positionDiff.totalX, positionDiff.totalY)));
-
+                if (positionDiff.startFingers === 3) {
+                    const direction = calculateDirection(calculateAngle(positionDiff.totalX, positionDiff.totalY));
+                    if (direction !== 'bottom') {
+                        emitSocket('threeFingerSwitchWindow', direction);
+                    }
+                }
                 setPositionDiff({
                     totalX: 0,
                     totalY: 0,
                     X: 0,
                     Y: 0,
+                    startFingers: 0,
                   });
                 setGestures([]);
             }
