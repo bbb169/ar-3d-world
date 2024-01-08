@@ -31,11 +31,13 @@ function calculateDirection(angle: number): Direction {
     return 'left';
 }
 
-export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHandler }: {
+export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHandler, isDraging, setIsDraging }: {
     children: ReactNode,
     setIsCloseGestureHandler: (value: boolean) => void,
+    isDraging: boolean,
+    setIsDraging: (value: boolean) => void,
     /** 控制鼠标灵敏度 */
-    sensitivity?: number
+    sensitivity?: number,
 }) {
     const [positionDiff, setPositionDiff] = useState<{
       /** total moved distance in X axis */
@@ -66,9 +68,9 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 const diffY = !first ? nativeEvent.absoluteY - positionDiff.Y : 0;
 
                 if (positionDiff.startFingers === 1) {
-                    console.log('moveMouse', diffX, diffY);
+                    console.log(isDraging ? 'dragMouse' : 'moveMouse', diffX, diffY);
 
-                    emitSocket('moveMouse', { left: diffY * sensitivity, top: -diffX * sensitivity });
+                    emitSocket('moveMouse', { left: diffY * sensitivity, top: -diffX * sensitivity, isDraging });
                 }
 
                 setPositionDiff({
@@ -104,6 +106,13 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                     Y: 0,
                     startFingers: 0,
                   });
+                  console.log('mle up');
+                if (isDraging) {
+                    console.log('mouseToggle up');
+                    
+                    emitSocket('mouseToggle', { down: 'up' });
+                    setIsDraging(false);
+                }
             }
         }}
     >{children}</PanGestureHandler>;

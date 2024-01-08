@@ -12,7 +12,16 @@ export function emitSocket(...params:ResolveValue<{
     'moveMouse': {
         left: number
         top: number
-      }
+        isDraging: boolean
+      };
+    'dragMouse': {
+        left: number
+        top: number
+      };
+    'mouseToggle': {
+        down?: 'down' | 'up'
+        button?: 'left' | 'right' | 'middle'
+    }
 }>) {
     if (socket) {
         socket.emit(...params);
