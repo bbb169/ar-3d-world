@@ -14,44 +14,46 @@ export default function HomePage(): React.JSX.Element {
   const [isDraging, setIsDraging] = useState(false);
 
   const mainContent = <View style={homePageStyles.wholeView}>
-    <Text>
-      {socketState}
-    </Text>
-    <Text>
-      use three finger to scroll down will close controll of computer
-    </Text>
-    <Text>
-      wifiIpAddress: {wifiIpAddress}
-    </Text>
-    {!isCloseGestureHandler && <IconButton buttonProps={{
-        title: 'click and move to drag mouse',
-        style: { backgroundColor: 'rgba(78, 116, 289, 1)' },
-        onPressIn() {
-          emitSocket('mouseToggle', { down: 'down' });
-          setIsDraging(true);
-        },
-      }} />}
-    {isCloseGestureHandler && <>
-      <IconButton buttonProps={{
-        title: 'click to open gestures handler',
-        style: { backgroundColor: 'rgba(78, 116, 289, 1)' },
-        onPress() {
-          setIsCloseGestureHandler(false);
-        },
-      }} />
-    <View>
-      <Text>change mouse sensitivity: {mouseSensitivity.toFixed(2)}</Text>
-      <Slider
-        value={mouseSensitivity}
-        onValueChange={setMouseSensitivity}
-        maximumValue={10}
-        minimumValue={1}
-        step={0.2}
-        trackStyle={{ height: 5, backgroundColor: 'blue' }}
-        allowTouchTrack
-      />
+    <View style={{ transform: [{ rotate: '90deg' }] }}>
+      <Text>
+        {socketState}
+      </Text>
+      <Text>
+        use three finger to scroll down will close controll of computer
+      </Text>
+      <Text>
+        wifiIpAddress: {wifiIpAddress}
+      </Text>
+      {!isCloseGestureHandler && <IconButton buttonProps={{
+          title: 'click and move to drag mouse',
+          style: { backgroundColor: 'rgba(78, 116, 289, 1)' },
+          onPressIn() {
+            emitSocket('mouseToggle', { down: 'down' });
+            setIsDraging(true);
+          },
+        }} />}
+      {isCloseGestureHandler && <>
+        <IconButton buttonProps={{
+          title: 'click to open gestures handler',
+          style: { backgroundColor: 'rgba(78, 116, 289, 1)' },
+          onPress() {
+            setIsCloseGestureHandler(false);
+          },
+        }} />
+      <View>
+        <Text>change mouse sensitivity: {mouseSensitivity.toFixed(2)}</Text>
+        <Slider
+          value={mouseSensitivity}
+          onValueChange={setMouseSensitivity}
+          maximumValue={10}
+          minimumValue={1}
+          step={0.2}
+          trackStyle={{ height: 5, backgroundColor: 'blue' }}
+          allowTouchTrack
+        />
+      </View>
+      </>}
     </View>
-    </>}
   </View>;
 
   return (
