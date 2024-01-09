@@ -12,10 +12,6 @@ export default function HomePage(): React.JSX.Element {
   const [mouseSensitivity, setMouseSensitivity] = useState(1);
   const [isCloseGestureHandler, setIsCloseGestureHandler] = useState(false);
   const [isDraging, setIsDraging] = useState(false);
-  // const [dragDiffPos, setDragDiffPos] = useState({
-  //   x: 0,
-  //   y: 0,
-  // });
 
   const mainContent = <View style={homePageStyles.wholeView}>
     <Text>
