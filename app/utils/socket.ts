@@ -21,7 +21,10 @@ export function emitSocket(...params:ResolveValue<{
     'mouseToggle': {
         down?: 'down' | 'up'
         button?: 'left' | 'right' | 'middle'
-    }
+    },
+    'mouseClick': {
+        button?: 'left' | 'right' | 'middle', double?: boolean
+    };
 }>) {
     if (socket) {
         socket.emit(...params);

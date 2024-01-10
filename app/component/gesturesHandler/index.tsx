@@ -1,7 +1,8 @@
-import React, { ReactNode, useState } from 'react';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import React, { ReactNode, useMemo, useState } from 'react';
+import { PanGestureHandler, State, TapGestureHandler } from 'react-native-gesture-handler';
 import { Direction } from '../../../constants/type';
 import { emitSocket } from '../../utils/socket';
+import { Dimensions } from 'react-native';
 
 // 计算射线角度的函数
 function calculateAngle(x: number, y: number) {
@@ -56,9 +57,21 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
       Y: 0,
       startFingers: 0,
     });
+    const { width, height } = useMemo(() => Dimensions.get('window'), []);
 
-
-    return <PanGestureHandler
+    return <TapGestureHandler onHandlerStateChange={({ nativeEvent }) => {
+        if (nativeEvent.state === State.END) {
+            const rightClick = ((nativeEvent.absoluteX / width) < 0.20) && ((nativeEvent.absoluteY / height) > 0.80);
+            console.log('mouseClick', nativeEvent.state);
+            
+            emitSocket('mouseClick', { button: rightClick ? 'right' : 'left' });
+        }
+    }} numberOfTaps={1}><TapGestureHandler onHandlerStateChange={({ nativeEvent }) => {
+        if (nativeEvent.state === State.END) {
+            console.log('mouseClick', nativeEvent.state);
+            emitSocket('mouseClick', { double: true });
+        }
+    }} numberOfTaps={2}><PanGestureHandler
         onGestureEvent={({ nativeEvent }) => {
             const calculatePosition = () => {
                 const { totalX, totalY, startFingers} = positionDiff;
@@ -115,5 +128,5 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 }
             }
         }}
-    >{children}</PanGestureHandler>;
+    >{children}</PanGestureHandler></TapGestureHandler></TapGestureHandler>;
 }
