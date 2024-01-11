@@ -79,6 +79,8 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
 
                 if (positionDiff.startFingers === 1) {
                     emitSocket('moveMouse', { left: diffY * sensitivity, top: -diffX * sensitivity, isDraging });
+                } else if (positionDiff.startFingers === 2) {
+                    emitSocket('scrollMouse', { x: diffY * sensitivity, y: diffX * sensitivity });
                 }
 
                 setPositionDiff({

@@ -25,6 +25,10 @@ export function emitSocket(...params:ResolveValue<{
     'mouseClick': {
         button?: 'left' | 'right' | 'middle', double?: boolean
     };
+    'scrollMouse': {
+        x: number
+        y: number
+    }
 }>) {
     if (socket) {
         socket.emit(...params);
