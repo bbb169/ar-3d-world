@@ -76,11 +76,12 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
 
                 const diffX = !first ? nativeEvent.absoluteX - positionDiff.X : 0;
                 const diffY = !first ? nativeEvent.absoluteY - positionDiff.Y : 0;
-
+                console.log('ACTIVE', positionDiff, nativeEvent.state, nativeEvent.handlerTag);
                 if (positionDiff.startFingers === 1) {
                     emitSocket('moveMouse', { left: diffY * sensitivity, top: -diffX * sensitivity, isDraging });
                 } else if (positionDiff.startFingers === 2) {
-                    emitSocket('scrollMouse', { x: diffY * sensitivity, y: diffX * sensitivity });
+                    const isXBigger = Math.abs(diffY * sensitivity) > Math.abs(diffX * sensitivity);
+                    emitSocket('scrollMouse', { x: isXBigger ? diffY * sensitivity : 0, y: !isXBigger ? diffX * sensitivity : 0 });
                 }
 
                 setPositionDiff({
