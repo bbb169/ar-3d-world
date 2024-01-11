@@ -62,13 +62,10 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
     return <TapGestureHandler onHandlerStateChange={({ nativeEvent }) => {
         if (nativeEvent.state === State.END) {
             const rightClick = ((nativeEvent.absoluteX / width) < 0.20) && ((nativeEvent.absoluteY / height) > 0.80);
-            console.log('mouseClick', nativeEvent.state);
-            
             emitSocket('mouseClick', { button: rightClick ? 'right' : 'left' });
         }
     }} numberOfTaps={1}><TapGestureHandler onHandlerStateChange={({ nativeEvent }) => {
         if (nativeEvent.state === State.END) {
-            console.log('mouseClick', nativeEvent.state);
             emitSocket('mouseClick', { double: true });
         }
     }} numberOfTaps={2}><PanGestureHandler
@@ -81,8 +78,6 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 const diffY = !first ? nativeEvent.absoluteY - positionDiff.Y : 0;
 
                 if (positionDiff.startFingers === 1) {
-                    console.log(isDraging ? 'dragMouse' : 'moveMouse', diffX, diffY);
-
                     emitSocket('moveMouse', { left: diffY * sensitivity, top: -diffX * sensitivity, isDraging });
                 }
 
