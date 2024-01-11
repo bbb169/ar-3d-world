@@ -23,3 +23,20 @@ export const publicStyles = StyleSheet.create({
 
   highlight: { fontWeight: '700' },
 });
+
+export const buttonStyles = (size = 32) => StyleSheet.create({
+  primaryButton: {
+    backgroundColor: '#1677ff',
+    color: '#fff',
+    height: size,
+    lineHeight: size,
+    ...publicStyles.displayCenter,
+  },
+
+  circleButton: {
+    width: size,
+    height: size,
+    borderRadius: size,
+    overflow: 'hidden',
+  },
+});

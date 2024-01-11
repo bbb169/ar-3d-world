@@ -25,7 +25,7 @@ export default function HomePage(): React.JSX.Element {
         wifiIpAddress: {wifiIpAddress}
       </Text>
       {!isCloseGestureHandler && <IconButton buttonProps={{
-          title: 'click and move to drag mouse',
+          title: 'drag',
           style: { backgroundColor: 'rgba(78, 116, 289, 1)' },
           onPressIn() {
             emitSocket('mouseToggle', { down: 'down' });
