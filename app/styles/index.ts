@@ -30,6 +30,8 @@ export const buttonStyles = (size = 32) => StyleSheet.create({
     color: '#fff',
     height: size,
     lineHeight: size,
+    borderRadius: 8,
+    overflow: 'hidden',
     ...publicStyles.displayCenter,
   },
 

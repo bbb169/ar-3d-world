@@ -27,6 +27,8 @@ export default function HomePage(): React.JSX.Element {
       {!isCloseGestureHandler && <IconButton buttonProps={{
           title: 'drag',
           style: { backgroundColor: 'rgba(78, 116, 289, 1)' },
+          type: 'circle',
+          size: 64,
           onPressIn() {
             emitSocket('mouseToggle', { down: 'down' });
             setIsDraging(true);
@@ -34,8 +36,10 @@ export default function HomePage(): React.JSX.Element {
         }} />}
       {isCloseGestureHandler && <>
         <IconButton buttonProps={{
-          title: 'click to open gestures handler',
+          title: 'Open',
           style: { backgroundColor: 'rgba(78, 116, 289, 1)' },
+          type: 'circle',
+          size: 64,
           onPress() {
             setIsCloseGestureHandler(false);
           },

@@ -4,12 +4,17 @@ import { AntDesign } from '@expo/vector-icons';
 import { IconButtonProps } from '@expo/vector-icons/build/createIconSet';
 import { buttonStyles, publicStyles } from '../../styles';
 
-const IconButton = ({buttonProps, iconProps}:{buttonProps?: Partial<ButtonProps> & TouchableOpacityProps, iconProps?: IconButtonProps<any>}) => {
+interface extraButtomProps {
+  type?: 'circle' | null
+  size?: number
+}
+
+const IconButton = ({buttonProps, iconProps}:{buttonProps?: Partial<ButtonProps & extraButtomProps> & TouchableOpacityProps, iconProps?: IconButtonProps<any>}) => {
   return (
-    <TouchableOpacity {...buttonProps} style={{ ...buttonStyles().primaryButton, ...buttonStyles().circleButton }}>
-      <View style={{  }}>
-        <AntDesign {...iconProps} />
-        {buttonProps?.title && <Text style={{ textAlign: 'center', lineHeight: 32 }}>{buttonProps.title}</Text>}
+    <TouchableOpacity {...buttonProps} style={{ ...buttonStyles(buttonProps?.size || 32).primaryButton, ...(buttonProps?.type === 'circle' ? buttonStyles(buttonProps.size).circleButton : {}) }}>
+      <View>
+        {iconProps?.name && <AntDesign {...iconProps} />}
+        {buttonProps?.title && <Text>{buttonProps.title}</Text>}
       </View>
     </TouchableOpacity>
   );
