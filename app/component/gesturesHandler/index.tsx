@@ -74,13 +74,27 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 const { totalX, totalY, startFingers} = positionDiff;
                 const first = startFingers === 0;
 
-                const diffX = !first ? nativeEvent.absoluteX - positionDiff.X : 0;
-                const diffY = !first ? nativeEvent.absoluteY - positionDiff.Y : 0;
+                // ============= add speed velocity factor ==============
+                const moveDisFactorX = sensitivity * Math.max(1, Math.abs(nativeEvent.velocityX / 500));
+                const moveDisFactorY = sensitivity * Math.max(1, Math.abs(nativeEvent.velocityY / 500));
+
+                let diffX = !first ? nativeEvent.absoluteX - positionDiff.X : 0;
+                let diffY = !first ? nativeEvent.absoluteY - positionDiff.Y : 0;
+
+                // ==================== handle distance in low speed ===========
+                const isHighSpeedMovement = (Math.abs(nativeEvent.velocityX) > 150 || Math.abs(nativeEvent.velocityY) > 150);
+
+                if (diffX && diffX / diffY < 0.1 && !isHighSpeedMovement) {
+                    diffX = 0;
+                } else if (diffY && diffY / diffX < 0.1 && !isHighSpeedMovement) {
+                    diffY = 0;
+                }
+
                 if (positionDiff.startFingers === 1 && nativeEvent.numberOfPointers === 1) {
-                    emitSocket('moveMouse', { left: diffY * sensitivity, top: -diffX * sensitivity, isDraging });
+                    emitSocket('moveMouse', { left: diffY * moveDisFactorY, top: -diffX * moveDisFactorX, isDraging });
                 } else if (positionDiff.startFingers === 2 && nativeEvent.numberOfPointers === 2) {
-                    const isXBigger = Math.abs(diffY * sensitivity) > Math.abs(diffX * sensitivity);
-                    emitSocket('scrollMouse', { x: isXBigger ? diffY * sensitivity : 0, y: !isXBigger ? diffX * sensitivity : 0 });
+                    const isXBigger = Math.abs(diffY) > Math.abs(diffX);
+                    emitSocket('scrollMouse', { x: isXBigger ? diffY * moveDisFactorY : 0, y: !isXBigger ? diffX * moveDisFactorX : 0 });
                 }
 
                 setPositionDiff({
@@ -119,7 +133,7 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                   console.log('mle up');
                 if (isDraging) {
                     console.log('mouseToggle up');
-                    
+
                     emitSocket('mouseToggle', { down: 'up' });
                     setIsDraging(false);
                 }
