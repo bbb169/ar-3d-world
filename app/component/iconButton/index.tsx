@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, Text, ButtonProps, TouchableOpacityProps } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { IconButtonProps } from '@expo/vector-icons/build/createIconSet';
-import { buttonStyles, publicStyles } from '../../styles';
+import { buttonStyles } from '../../styles';
 
 interface extraButtomProps {
   type?: 'circle' | null
