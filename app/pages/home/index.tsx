@@ -6,6 +6,7 @@ import IconButton from '../../component/iconButton';
 import { GesturesHandler } from '../../component/gesturesHandler';
 import { emitSocket } from '../../utils/socket';
 import { Slider } from '@rneui/base';
+import { publicStyles } from '../../styles';
 
 export default function HomePage(): React.JSX.Element {
   const [socketState, wifiIpAddress] = useInfosFromSocket();
@@ -14,7 +15,7 @@ export default function HomePage(): React.JSX.Element {
   const [isDraging, setIsDraging] = useState(false);
 
   const mainContent = <View style={homePageStyles.wholeView}>
-    <View style={{ transform: [{ rotate: '90deg' }] }}>
+    <View style={{ transform: [{ rotate: '90deg' }], ...publicStyles.displayCenter }}>
       <Text>
         {socketState}
       </Text>
