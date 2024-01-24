@@ -7,9 +7,11 @@ import { GesturesHandler } from '../../component/gesturesHandler';
 import { emitSocket } from '../../utils/socket';
 import { Slider } from '@rneui/base';
 import { publicStyles } from '../../styles';
+import { IpAddressInput } from '../../component/ipAddressInput';
 
 export default function HomePage(): React.JSX.Element {
-  const [socketState, wifiIpAddress] = useInfosFromSocket();
+  const [userSetIp, setUserSetIp] = useState<string>('');
+  const [socketState, wifiIpAddress] = useInfosFromSocket(userSetIp);
   const [mouseSensitivity, setMouseSensitivity] = useState(1);
   const [isCloseGestureHandler, setIsCloseGestureHandler] = useState(false);
   const [isDraging, setIsDraging] = useState(false);
@@ -36,6 +38,17 @@ export default function HomePage(): React.JSX.Element {
           },
         }} />}
       {isCloseGestureHandler && <>
+        <IpAddressInput onChange={(val) => {
+          if (val.every(item => {
+            if (item.search(/\d+/g) > -1) {
+              return Number(item) > 0 &&  Number(item) < 255;
+            }
+            return false;
+          })) {
+            setUserSetIp(val.join('.'));
+            console.log(val);
+          }
+        }} />
         <IconButton buttonProps={{
           title: 'Open',
           style: { backgroundColor: 'rgba(78, 116, 289, 1)' },

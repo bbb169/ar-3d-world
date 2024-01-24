@@ -5,10 +5,18 @@ import { initSocket } from '../../../utils/socket';
 
 type SocketState = 'STOP' | 'STARED' | 'CONNECTED' | 'DISCONNECTED';
 
-export default function useInfosFromSocket (): [SocketState, string] {
+export default function useInfosFromSocket (userSetIp: string): [SocketState, string] {
     const [socket, setSocket] = useState<Socket | void>();
     const [wifiIpAddress, setWifiIpAddress] = useState<string>('');
     const [socketState, setSocketState] = useState<SocketState>('STOP');
+
+    useEffect(() => {
+        if (userSetIp) {
+            setSocket();
+            console.log(userSetIp);
+            setWifiIpAddress(userSetIp);
+        }
+    }, [userSetIp]);
 
 
     useEffect(() => {
@@ -25,14 +33,14 @@ export default function useInfosFromSocket (): [SocketState, string] {
                 }
             });
         } else if (!socket && wifiIpAddress) {
-            console.log(`http://${__DEV__ === true ? '172.25.141.242' : wifiIpAddress}:${3000}`);
-            setSocket(io(`http://${__DEV__ === true ? '172.25.141.242' : wifiIpAddress}:${3000}`));
-            setSocketState('STARED');
+            console.log(`http://${wifiIpAddress}:${3000}`);
+            setSocket(io(`http://${wifiIpAddress}:${3000}`));
         } else if (socket && wifiIpAddress) {
             console.log(socket.connected);
             initSocket(socket);
             // client-side
             socket.on('connect', () => {
+                setSocketState('STARED');
                 console.log('connetct', socket.connected);
             });
 
