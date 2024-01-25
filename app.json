@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "touch-panel-emulator-mobile",
-    "slug": "touch-panel-emulator-mobile",
+    "name": "ar-3d-world",
+    "slug": "ar-3d-world",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
