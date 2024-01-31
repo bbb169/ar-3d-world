@@ -21,11 +21,6 @@ export default function useInfosFromSocket (userSetIp: string): [SocketState, st
 
     useEffect(() => {
         if (!wifiIpAddress) {
-            // fetch('http://localhost:3000/index').then((res) => {
-            //     console.log('res', res);
-            // }).catch(err => {
-            //     console.log('err', err);
-            // });
             NetInfo.fetch().then((connectionInfo) => {
                 if (connectionInfo.type === 'wifi' && connectionInfo.details) {
                     console.log('ipAddress', connectionInfo?.details?.ipAddress);
@@ -34,6 +29,11 @@ export default function useInfosFromSocket (userSetIp: string): [SocketState, st
             });
         } else if (!socket && wifiIpAddress) {
             console.log(`http://${wifiIpAddress}:${3000}`);
+            fetch(`http://${wifiIpAddress}:${3000}/index`).then((res) => {
+                console.log('res', res);
+            }).catch(err => {
+                console.log('err', err);
+            });
             setSocket(io(`http://${wifiIpAddress}:${3000}`));
         } else if (socket && wifiIpAddress) {
             console.log(socket.connected);
