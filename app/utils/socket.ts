@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io-client';
-type ResolveValue<T> = T extends Record<string, any> ? [keyof T, T[keyof T]] : never;
+export type ResolveValue<T> = T extends Record<string, any> ? [keyof T, T[keyof T]] : never;
 
 let socket: Socket;
 

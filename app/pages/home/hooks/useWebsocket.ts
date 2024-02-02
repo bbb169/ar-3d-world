@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import NetInfo from '@react-native-community/netinfo';
 import { initSocket } from '../../../utils/socket';
+import { getData, storeData } from '../../../utils/storage';
 
 type SocketState = 'STOP' | 'STARED' | 'CONNECTED' | 'DISCONNECTED';
 
@@ -44,6 +45,7 @@ export default function useInfosFromSocket (userSetIp: string): [SocketState, st
             // client-side
             socket.on('connect', () => {
                 setSocketState('STARED');
+                storeData('ipAddress', wifiIpAddress);
                 console.log('connetct', socket.connected);
             });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { homePageStyles } from './style';
 import useInfosFromSocket from './hooks/useWebsocket';
@@ -8,6 +8,7 @@ import { emitSocket } from '../../utils/socket';
 import { Slider } from '@rneui/base';
 import { publicStyles } from '../../styles';
 import { IpAddressInput } from '../../component/ipAddressInput';
+import { getData } from '../../utils/storage';
 
 export default function HomePage(): React.JSX.Element {
   const [userSetIp, setUserSetIp] = useState<string>('');
@@ -15,6 +16,14 @@ export default function HomePage(): React.JSX.Element {
   const [mouseSensitivity, setMouseSensitivity] = useState(1);
   const [isCloseGestureHandler, setIsCloseGestureHandler] = useState(false);
   const [isDraging, setIsDraging] = useState(false);
+
+  useEffect(() => {
+    getData('ipAddress').then(ipAddress => {
+      if (ipAddress) {
+        setUserSetIp(ipAddress);
+      }
+    });
+  }, []);
 
   const mainContent = <View style={homePageStyles.wholeView}>
     <View style={{ transform: [{ rotate: '90deg' }], ...publicStyles.displayCenter }}>
