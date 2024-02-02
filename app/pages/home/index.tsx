@@ -11,7 +11,7 @@ import { IpAddressInput } from '../../component/ipAddressInput';
 
 export default function HomePage(): React.JSX.Element {
   const [userSetIp, setUserSetIp] = useState<string>('');
-  const [socketState, wifiIpAddress] = useInfosFromSocket(userSetIp);
+  const [socketState, wifiIpAddress, error] = useInfosFromSocket(userSetIp);
   const [mouseSensitivity, setMouseSensitivity] = useState(1);
   const [isCloseGestureHandler, setIsCloseGestureHandler] = useState(false);
   const [isDraging, setIsDraging] = useState(false);
@@ -26,6 +26,9 @@ export default function HomePage(): React.JSX.Element {
       </Text>
       <Text>
         wifiIpAddress: {wifiIpAddress}
+      </Text>
+      <Text>
+        error: {error}
       </Text>
       {!isCloseGestureHandler && <IconButton buttonProps={{
           title: 'drag',

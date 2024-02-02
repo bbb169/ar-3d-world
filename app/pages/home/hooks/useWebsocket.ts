@@ -5,10 +5,11 @@ import { initSocket } from '../../../utils/socket';
 
 type SocketState = 'STOP' | 'STARED' | 'CONNECTED' | 'DISCONNECTED';
 
-export default function useInfosFromSocket (userSetIp: string): [SocketState, string] {
+export default function useInfosFromSocket (userSetIp: string): [SocketState, string, any] {
     const [socket, setSocket] = useState<Socket | void>();
     const [wifiIpAddress, setWifiIpAddress] = useState<string>('');
     const [socketState, setSocketState] = useState<SocketState>('STOP');
+    const [error, setError] = useState<any>();
 
     useEffect(() => {
         if (userSetIp) {
@@ -31,7 +32,9 @@ export default function useInfosFromSocket (userSetIp: string): [SocketState, st
             console.log(`http://${wifiIpAddress}:${3000}`);
             fetch(`http://${wifiIpAddress}:${3000}/index`).then((res) => {
                 console.log('res', res);
+                setError(`res: ${res}`);
             }).catch(err => {
+                setError(`err: ${err}`);
                 console.log('err', err);
             });
             setSocket(io(`http://${wifiIpAddress}:${3000}`));
@@ -59,5 +62,5 @@ export default function useInfosFromSocket (userSetIp: string): [SocketState, st
         }
     }, [socket, wifiIpAddress]);
 
-    return [socketState, (__DEV__ === true ? '172.25.141.242' : wifiIpAddress)];
+    return [socketState, (__DEV__ === true ? '172.25.141.242' : wifiIpAddress), error];
 }
