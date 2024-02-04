@@ -6,8 +6,6 @@ export function useDeviceIpAddress() {
 
     useEffect(() => {
         Network.getIpAddressAsync().then((res) => {
-            console.log('getIpAddressAsync', res);
-            
             setIp(res);
         });
     }, []);

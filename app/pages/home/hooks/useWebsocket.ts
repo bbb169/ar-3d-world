@@ -19,13 +19,7 @@ export default function useInfosFromSocket (userSetIp: string): [SocketState, st
     useEffect(() => {
         if (socket && deviceIp) {
             const sendDeviceInfo = (times = 0) => {
-                console.log(socket?.connected, 'sendDeviceInfo');
                 if (times < 10 && socket?.connected) {
-                    console.log('deviceInfo', {
-                        deviceName: device?.deviceName || '',
-                        ipAddress: deviceIp,
-                    });
-
                     emitSocket('deviceInfo', {
                         deviceName: device?.deviceName || '',
                         ipAddress: deviceIp,
