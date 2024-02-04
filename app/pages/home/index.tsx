@@ -9,6 +9,7 @@ import { Slider } from '@rneui/base';
 import { publicStyles } from '../../styles';
 import { IpAddressInput } from '../../component/ipAddressInput';
 import { getData } from '../../utils/storage';
+import device, { getDeviceTypeAsync } from 'expo-device';
 
 export default function HomePage(): React.JSX.Element {
   const [userSetIp, setUserSetIp] = useState<string>('');
@@ -28,13 +29,16 @@ export default function HomePage(): React.JSX.Element {
   const mainContent = <View style={homePageStyles.wholeView}>
     <View style={{ transform: [{ rotate: '90deg' }], ...publicStyles.displayCenter }}>
       <Text>
+        device name: {device?.deviceName}
+      </Text>
+      <Text>
+        wifiIpAddress: {wifiIpAddress}
+      </Text>
+      <Text>
         {socketState}
       </Text>
       <Text>
         use three finger to scroll down will close controll of computer
-      </Text>
-      <Text>
-        wifiIpAddress: {wifiIpAddress}
       </Text>
       <Text>
         error: {error}

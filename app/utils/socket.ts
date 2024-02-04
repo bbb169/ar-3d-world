@@ -28,7 +28,11 @@ export function emitSocket(...params:ResolveValue<{
     'scrollMouse': {
         x: number
         y: number
-    }
+    };
+    'deviceInfo': {
+        deviceName: string;
+        ipAddress: string;
+    };
 }>) {
     if (socket) {
         socket.emit(...params);
