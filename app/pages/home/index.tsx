@@ -62,7 +62,6 @@ export default function HomePage(): React.JSX.Element {
             return false;
           })) {
             setUserSetIp(val.join('.'));
-            console.log(val);
           }
         }} />
         <IconButton buttonProps={{

@@ -17,8 +17,6 @@ function calculateAngle(x: number, y: number) {
 }
 
 function calculateDirection(angle: number): Direction {
-    console.log(angle);
-
     if ((angle <= 45 && angle >= 0) || (angle > -45 && angle <= 0)) {
         return 'top';
     } else if (angle > 45 && angle <= 135) {
@@ -28,7 +26,6 @@ function calculateDirection(angle: number): Direction {
     } else if (angle < -45 && angle > -135) {
         return 'left';
     }
-    console.log(angle, 'something goes wrong');
     return 'left';
 }
 
@@ -107,12 +104,10 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
             };
 
             if (nativeEvent.state === State.ACTIVE) {
-                // console.log('ACTIVE', positionDiff);
                 calculatePosition();
             }
         }}
         onHandlerStateChange={({ nativeEvent }) => {
-            // console.log(nativeEvent.state, positionDiff.startFingers);
             if (nativeEvent.state === State.END) {
                 // ============  threeFingerSwitchWindow ================
                 if (positionDiff.startFingers === 3) {
@@ -130,10 +125,7 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                     Y: 0,
                     startFingers: 0,
                   });
-                  console.log('mle up');
                 if (isDraging) {
-                    console.log('mouseToggle up');
-
                     emitSocket('mouseToggle', { down: 'up' });
                     setIsDraging(false);
                 }
