@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, Text, ButtonProps, TouchableOpacityProps } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { IconButtonProps } from '@expo/vector-icons/build/createIconSet';
-import { buttonStyles } from '../../styles';
+import { buttonStyles, textStyles } from '../../styles';
 
 interface extraButtomProps {
   type?: 'circle' | null
@@ -14,7 +14,7 @@ const IconButton = ({buttonProps, iconProps}:{buttonProps?: Partial<ButtonProps 
     <TouchableOpacity {...buttonProps} style={{ ...buttonStyles(buttonProps?.size || 32).primaryButton, ...(buttonProps?.type === 'circle' ? buttonStyles(buttonProps.size).circleButton : {}) }}>
       <View>
         {iconProps?.name && <AntDesign {...iconProps} />}
-        {buttonProps?.title && <Text>{buttonProps.title}</Text>}
+        {buttonProps?.title && <Text style={textStyles.textColor}>{buttonProps.title}</Text>}
       </View>
     </TouchableOpacity>
   );
