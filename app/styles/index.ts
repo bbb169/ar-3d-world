@@ -27,7 +27,7 @@ export const publicStyles = StyleSheet.create({
 export const buttonStyles = (size = 32) => StyleSheet.create({
   primaryButton: {
     backgroundColor: '#1677ff',
-    color: '#fff',
+    color: 'white',
     height: size,
     lineHeight: size,
     borderRadius: 8,
@@ -40,5 +40,11 @@ export const buttonStyles = (size = 32) => StyleSheet.create({
     height: size,
     borderRadius: size,
     overflow: 'hidden',
+  },
+});
+
+export const textStyles = StyleSheet.create({
+  textColor: {
+    color: 'white',
   },
 });

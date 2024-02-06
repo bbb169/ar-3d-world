@@ -6,10 +6,10 @@ import IconButton from '../../component/iconButton';
 import { GesturesHandler } from '../../component/gesturesHandler';
 import { emitSocket } from '../../utils/socket';
 import { Slider } from '@rneui/base';
-import { publicStyles } from '../../styles';
+import { publicStyles, textStyles } from '../../styles';
 import { IpAddressInput } from '../../component/ipAddressInput';
 import { getData } from '../../utils/storage';
-import device, { getDeviceTypeAsync } from 'expo-device';
+import device from 'expo-device';
 
 export default function HomePage(): React.JSX.Element {
   const [userSetIp, setUserSetIp] = useState<string>('');
@@ -28,23 +28,23 @@ export default function HomePage(): React.JSX.Element {
 
   const mainContent = <View style={homePageStyles.wholeView}>
     <View style={{ transform: [{ rotate: '90deg' }], ...publicStyles.displayCenter }}>
-      <Text>
+      <Text style={textStyles.textColor}>
         device name: {device?.deviceName}
       </Text>
-      <Text>
+      <Text style={textStyles.textColor}>
         wifiIpAddress: {wifiIpAddress}
       </Text>
-      <Text>
+      <Text style={textStyles.textColor}>
         {socketState}
       </Text>
-      <Text>
+      <Text style={textStyles.textColor}>
         use three finger to scroll down will close controll of computer
       </Text>
       <Text>
         error: {error}
       </Text>
       {!isCloseGestureHandler && <IconButton buttonProps={{
-          title: 'drag',
+          title: 'Drag',
           style: { backgroundColor: 'rgba(78, 116, 289, 1)' },
           type: 'circle',
           size: 64,
@@ -75,7 +75,7 @@ export default function HomePage(): React.JSX.Element {
           },
         }} />
       <View>
-        <Text>change mouse sensitivity: {mouseSensitivity.toFixed(2)}</Text>
+        <Text style={textStyles.textColor}>change mouse sensitivity: {mouseSensitivity.toFixed(2)}</Text>
         <Slider
           value={mouseSensitivity}
           onValueChange={setMouseSensitivity}

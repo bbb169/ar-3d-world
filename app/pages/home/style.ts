@@ -10,7 +10,8 @@ export const homePageStyles = StyleSheet.create({
   wholeView: {
     ...wholeViewStyle,
     position: 'relative',
-    backgroundColor: 'gray',
+    backgroundColor: 'black',
+    color: 'white',
   },
 
   bottomStick: {
