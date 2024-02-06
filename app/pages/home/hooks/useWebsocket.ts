@@ -4,7 +4,6 @@ import NetInfo from '@react-native-community/netinfo';
 import { emitSocket, initSocket } from '../../../utils/socket';
 import { storeData } from '../../../utils/storage';
 import device from 'expo-device';
-import * as Network from 'expo-network';
 import { useDeviceIpAddress } from './useDeviceIpAddress';
 
 type SocketState = 'STOP' | 'STARED' | 'CONNECTED' | 'DISCONNECTED';
