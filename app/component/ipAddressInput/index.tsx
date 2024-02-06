@@ -1,8 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import { Input } from '@rneui/base';
-import { useEffect, useMemo, useState } from 'react';
-import { StyleProp, TextStyle } from 'react-native';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { StyleProp, TextStyle, Dimensions, View } from 'react-native';
 import IconButton from '../iconButton';
 
 export function IpAddressInput({ onChange }: { onChange: (val: string[]) => void }) {
@@ -13,14 +12,15 @@ export function IpAddressInput({ onChange }: { onChange: (val: string[]) => void
         borderColor: '#1677ff',
         borderRadius: 8,
         overflow: 'hidden',
-    }), [height]);
+        paddingLeft: 8,
+    }), []);
 
     return <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', width: height * 8 / 9 }}>
         <View style={{ width: height * 1 / 10 }}>
-        <Input style={style} onChange={(e) => {
-            ip[0] = e.nativeEvent.text;
-            setIp([...ip]);
-         }}/>
+            <Input style={style} onChange={(e) => {
+                ip[0] = e.nativeEvent.text;
+                setIp([...ip]);
+            }}/>
         </View>
         <View style={{ width: height * 1 / 10 }}><Input style={style} onChange={(e) => {
             ip[1] = e.nativeEvent.text;
