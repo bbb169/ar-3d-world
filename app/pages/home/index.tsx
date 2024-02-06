@@ -13,7 +13,7 @@ import device from 'expo-device';
 
 export default function HomePage(): React.JSX.Element {
   const [userSetIp, setUserSetIp] = useState<string>('');
-  const [socketState, wifiIpAddress, error] = useInfosFromSocket(userSetIp);
+  const [socketState, wifiIpAddress] = useInfosFromSocket(userSetIp);
   const [mouseSensitivity, setMouseSensitivity] = useState(1);
   const [isCloseGestureHandler, setIsCloseGestureHandler] = useState(false);
   const [isDraging, setIsDraging] = useState(false);
@@ -39,9 +39,6 @@ export default function HomePage(): React.JSX.Element {
       </Text>
       <Text style={textStyles.textColor}>
         use three finger to scroll down will close controll of computer
-      </Text>
-      <Text>
-        error: {error}
       </Text>
       {!isCloseGestureHandler && <IconButton buttonProps={{
           title: 'Drag',

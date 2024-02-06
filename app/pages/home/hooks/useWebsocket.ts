@@ -8,11 +8,10 @@ import { useDeviceIpAddress } from './useDeviceIpAddress';
 
 type SocketState = 'STOP' | 'STARED' | 'CONNECTED' | 'DISCONNECTED';
 
-export default function useInfosFromSocket (userSetIp: string): [SocketState, string, any] {
+export default function useInfosFromSocket (userSetIp: string): [SocketState, string] {
     const [socket, setSocket] = useState<Socket | void>();
     const [wifiIpAddress, setWifiIpAddress] = useState<string>('');
     const [socketState, setSocketState] = useState<SocketState>('STOP');
-    const [error, setError] = useState<any>();
     const [deviceIp] = useDeviceIpAddress();
 
     useEffect(() => {
@@ -37,7 +36,6 @@ export default function useInfosFromSocket (userSetIp: string): [SocketState, st
     useEffect(() => {
         if (userSetIp) {
             setSocket();
-            console.log(userSetIp);
             setWifiIpAddress(userSetIp);
         }
     }, [userSetIp]);
@@ -47,28 +45,17 @@ export default function useInfosFromSocket (userSetIp: string): [SocketState, st
         if (!wifiIpAddress) {
             NetInfo.fetch().then((connectionInfo) => {
                 if (connectionInfo.type === 'wifi' && connectionInfo.details) {
-                    console.log('ipAddress', connectionInfo?.details?.ipAddress);
-                    setWifiIpAddress(connectionInfo.details.ipAddress);
+                    setWifiIpAddress(connectionInfo.details.ipAddress as string);
                 }
             });
         } else if (!socket && wifiIpAddress) {
-            console.log(`http://${wifiIpAddress}:${3000}`);
-            fetch(`http://${wifiIpAddress}:${3000}/index`).then((res) => {
-                console.log('res', res);
-                setError(`res: ${res}`);
-            }).catch(err => {
-                setError(`err: ${err}`);
-                console.log('err', err);
-            });
             setSocket(io(`http://${wifiIpAddress}:${3000}`));
         } else if (socket && wifiIpAddress) {
-            console.log(socket.connected);
             initSocket(socket);
             // client-side
             socket.on('connect', () => {
                 setSocketState('STARED');
                 storeData('ipAddress', wifiIpAddress);
-                console.log('connetct', socket.connected);
             });
 
             socket.on('disconnect', () => {
@@ -76,15 +63,8 @@ export default function useInfosFromSocket (userSetIp: string): [SocketState, st
                 setSocketState('DISCONNECTED');
                 console.log('========== disconnected ws ===========');
             });
-
-            // =================== Heartbeat Detection ====================
-            // setInterval(() => {
-            //     console.log('======== heartDetect ============ ');
-
-            //     // emitSocket('heartDetect');
-            // }, 10000);
         }
     }, [socket, wifiIpAddress]);
 
-    return [socketState, (__DEV__ === true ? '172.25.141.242' : wifiIpAddress), error];
+    return [socketState, (__DEV__ === true ? '172.25.141.242' : wifiIpAddress)];
 }
