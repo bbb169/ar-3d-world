@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Dimensions, Text, View } from 'react-native';
 import { homePageStyles } from './style';
 import useInfosFromSocket from './hooks/useWebsocket';
 import IconButton from '../../component/iconButton';
@@ -17,6 +17,7 @@ export default function HomePage(): React.JSX.Element {
   const [mouseSensitivity, setMouseSensitivity] = useState(1);
   const [isCloseGestureHandler, setIsCloseGestureHandler] = useState(false);
   const [isDraging, setIsDraging] = useState(false);
+  const { height } = useMemo(() => Dimensions.get('window'), []);
 
   useEffect(() => {
     getData('ipAddress').then(ipAddress => {
@@ -70,8 +71,8 @@ export default function HomePage(): React.JSX.Element {
             setIsCloseGestureHandler(false);
           },
         }} />
-      <View>
-        <Text style={textStyles.textColor}>change mouse sensitivity: {mouseSensitivity.toFixed(2)}</Text>
+      <View style={{ width: height * 1 / 3 }}>
+        <Text style={{...textStyles.textColor, width: height * 1 / 3}}>change mouse sensitivity: {mouseSensitivity.toFixed(2)}</Text>
         <Slider
           value={mouseSensitivity}
           onValueChange={setMouseSensitivity}
