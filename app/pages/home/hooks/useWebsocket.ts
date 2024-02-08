@@ -6,12 +6,12 @@ import { storeData } from '../../../utils/storage';
 import device from 'expo-device';
 import { useDeviceIpAddress } from './useDeviceIpAddress';
 
-type SocketState = 'STOP' | 'STARED' | 'CONNECTED' | 'DISCONNECTED';
+type SocketState = '未连接' | '已连接' | '连接断开';
 
 export default function useInfosFromSocket(userSetIp: string): [SocketState, string] {
   const [socket, setSocket] = useState<Socket | void>();
   const [wifiIpAddress, setWifiIpAddress] = useState<string>('');
-  const [socketState, setSocketState] = useState<SocketState>('STOP');
+  const [socketState, setSocketState] = useState<SocketState>('未连接');
   const [deviceIp] = useDeviceIpAddress();
 
   useEffect(() => {
@@ -54,14 +54,14 @@ export default function useInfosFromSocket(userSetIp: string): [SocketState, str
       // client-side
       socket.on('connect', () => {
         socket.on('confirm-connect-device', () => {
-          setSocketState('STARED');
+          setSocketState('已连接');
           storeData('ipAddress', wifiIpAddress);
         });
       });
 
       socket.on('disconnect', () => {
         setSocket();
-        setSocketState('DISCONNECTED');
+        setSocketState('连接断开');
         console.log('========== disconnected ws ===========');
       });
     }
