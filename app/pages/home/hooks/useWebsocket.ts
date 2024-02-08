@@ -8,63 +8,64 @@ import { useDeviceIpAddress } from './useDeviceIpAddress';
 
 type SocketState = 'STOP' | 'STARED' | 'CONNECTED' | 'DISCONNECTED';
 
-export default function useInfosFromSocket (userSetIp: string): [SocketState, string] {
-    const [socket, setSocket] = useState<Socket | void>();
-    const [wifiIpAddress, setWifiIpAddress] = useState<string>('');
-    const [socketState, setSocketState] = useState<SocketState>('STOP');
-    const [deviceIp] = useDeviceIpAddress();
+export default function useInfosFromSocket(userSetIp: string): [SocketState, string] {
+  const [socket, setSocket] = useState<Socket | void>();
+  const [wifiIpAddress, setWifiIpAddress] = useState<string>('');
+  const [socketState, setSocketState] = useState<SocketState>('STOP');
+  const [deviceIp] = useDeviceIpAddress();
 
-    useEffect(() => {
-        if (socket && deviceIp) {
-            const sendDeviceInfo = (times = 0) => {
-                if (times < 10 && socket?.connected) {
-                    emitSocket('deviceInfo', {
-                        deviceName: device?.deviceName || '',
-                        ipAddress: deviceIp,
-                    });
-                } else {
-                    setTimeout(() => {
-                        sendDeviceInfo(times + 1);
-                    }, 10000);
-                }
-            };
-
-            sendDeviceInfo();
+  useEffect(() => {
+    if (socket && deviceIp) {
+      const sendDeviceInfo = (times = 0) => {
+        if (times < 10 && socket?.connected) {
+          emitSocket('deviceInfo', {
+            deviceName: device?.deviceName || '',
+            ipAddress: deviceIp,
+          });
+        } else {
+          setTimeout(() => {
+            sendDeviceInfo(times + 1);
+          }, 10000);
         }
-    }, [socket, deviceIp]);
+      };
 
-    useEffect(() => {
-        if (userSetIp) {
-            setSocket();
-            setWifiIpAddress(userSetIp);
+      sendDeviceInfo();
+    }
+  }, [socket, deviceIp]);
+
+  useEffect(() => {
+    if (userSetIp) {
+      setSocket();
+      setWifiIpAddress(userSetIp);
+    }
+  }, [userSetIp]);
+
+  useEffect(() => {
+    if (!wifiIpAddress) {
+      NetInfo.fetch().then((connectionInfo) => {
+        if (connectionInfo.type === 'wifi' && connectionInfo.details) {
+          setWifiIpAddress(connectionInfo.details.ipAddress as string);
         }
-    }, [userSetIp]);
+      });
+    } else if (!socket && wifiIpAddress) {
+      setSocket(io(`http://${wifiIpAddress}:${3000}`));
+    } else if (socket && wifiIpAddress) {
+      initSocket(socket);
+      // client-side
+      socket.on('connect', () => {
+        socket.on('confirm-connect-device', () => {
+          setSocketState('STARED');
+          storeData('ipAddress', wifiIpAddress);
+        });
+      });
 
+      socket.on('disconnect', () => {
+        setSocket();
+        setSocketState('DISCONNECTED');
+        console.log('========== disconnected ws ===========');
+      });
+    }
+  }, [socket, wifiIpAddress]);
 
-    useEffect(() => {
-        if (!wifiIpAddress) {
-            NetInfo.fetch().then((connectionInfo) => {
-                if (connectionInfo.type === 'wifi' && connectionInfo.details) {
-                    setWifiIpAddress(connectionInfo.details.ipAddress as string);
-                }
-            });
-        } else if (!socket && wifiIpAddress) {
-            setSocket(io(`http://${wifiIpAddress}:${3000}`));
-        } else if (socket && wifiIpAddress) {
-            initSocket(socket);
-            // client-side
-            socket.on('connect', () => {
-                setSocketState('STARED');
-                storeData('ipAddress', wifiIpAddress);
-            });
-
-            socket.on('disconnect', () => {
-                setSocket();
-                setSocketState('DISCONNECTED');
-                console.log('========== disconnected ws ===========');
-            });
-        }
-    }, [socket, wifiIpAddress]);
-
-    return [socketState, (__DEV__ === true ? '172.25.141.242' : wifiIpAddress)];
+  return [socketState, __DEV__ === true ? '172.25.141.242' : wifiIpAddress];
 }
