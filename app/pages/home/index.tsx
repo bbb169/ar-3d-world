@@ -30,19 +30,19 @@ export default function HomePage(): React.JSX.Element {
   const mainContent = <View style={homePageStyles.wholeView}>
     <View style={{ transform: [{ rotate: '90deg' }], ...publicStyles.displayCenter }}>
       <Text style={textStyles.textColor}>
-        device name: {device?.deviceName}
+        设备名: {device?.deviceName || '未知'}
       </Text>
       <Text style={textStyles.textColor}>
-        wifiIpAddress: {wifiIpAddress}
+        wifi的ip地址: {wifiIpAddress || '未知'}
       </Text>
       <Text style={textStyles.textColor}>
         {socketState}
       </Text>
       <Text style={textStyles.textColor}>
-        use three finger to scroll down will close controll of computer
+        三指下滑解除控制电脑
       </Text>
       {!isCloseGestureHandler && <IconButton buttonProps={{
-          title: 'Drag',
+          title: '按下',
           style: { backgroundColor: 'rgba(78, 116, 289, 1)' },
           type: 'circle',
           size: 64,
