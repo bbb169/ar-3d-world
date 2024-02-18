@@ -3,6 +3,7 @@ import { PanGestureHandler, State, TapGestureHandler } from 'react-native-gestur
 import { Direction } from '../../../constants/type';
 import { emitSocket } from '../../utils/socket';
 import { Dimensions } from 'react-native';
+import { Vibration } from 'react-native';
 
 // 计算射线角度的函数
 function calculateAngle(x: number, y: number) {
@@ -92,7 +93,11 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 } else if (positionDiff.startFingers === 2 && nativeEvent.numberOfPointers === 2) {
                     const isXBigger = Math.abs(diffY) > Math.abs(diffX);
                     emitSocket('scrollMouse', { x: isXBigger ? diffY * moveDisFactorY : 0, y: !isXBigger ? diffX * moveDisFactorX : 0 });
+                } else if (positionDiff.startFingers === 0 && nativeEvent.numberOfPointers === 3) {
+                    Vibration.vibrate([0, 50]);
                 }
+
+                console.log(totalX + diffX, totalY + diffY);
 
                 setPositionDiff({
                     totalX: totalX + diffX,
@@ -112,6 +117,8 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 // ============  threeFingerSwitchWindow ================
                 if (positionDiff.startFingers === 3) {
                     const direction = calculateDirection(calculateAngle(positionDiff.totalX, positionDiff.totalY));
+                    console.log(direction, positionDiff);
+                    
                     if (direction !== 'bottom') {
                         emitSocket('threeFingerSwitchWindow', direction);
                     } else {
