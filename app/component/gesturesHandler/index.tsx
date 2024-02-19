@@ -2,8 +2,7 @@ import React, { ReactNode, useMemo, useState } from 'react';
 import { PanGestureHandler, State, TapGestureHandler } from 'react-native-gesture-handler';
 import { Direction } from '../../../constants/type';
 import { emitSocket } from '../../utils/socket';
-import { Dimensions } from 'react-native';
-import { Vibration } from 'react-native';
+import { Dimensions, Vibration } from 'react-native';
 
 // 计算射线角度的函数
 function calculateAngle(x: number, y: number) {
@@ -97,7 +96,9 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                     Vibration.vibrate([0, 50]);
                 }
 
-                console.log(totalX + diffX, totalY + diffY);
+                if (positionDiff.startFingers !== 0 && positionDiff.startFingers !== nativeEvent.numberOfPointers) {
+                    return;
+                }
 
                 setPositionDiff({
                     totalX: totalX + diffX,
