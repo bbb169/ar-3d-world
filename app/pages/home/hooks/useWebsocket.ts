@@ -25,7 +25,7 @@ export default function useInfosFromSocket(userSetIp: string): [SocketState, str
         } else {
           setTimeout(() => {
             sendDeviceInfo(times + 1);
-          }, 10000);
+          }, 1000);
         }
       };
 
@@ -52,11 +52,9 @@ export default function useInfosFromSocket(userSetIp: string): [SocketState, str
     } else if (socket && wifiIpAddress) {
       initSocket(socket);
       // client-side
-      socket.on('connect', () => {
-        socket.on('confirm-connect-device', () => {
-          setSocketState('已连接');
-          storeData('ipAddress', wifiIpAddress);
-        });
+      socket.on('confirm-connect-device', () => {
+        setSocketState('已连接');
+        storeData('ipAddress', wifiIpAddress);
       });
 
       socket.on('disconnect', () => {
