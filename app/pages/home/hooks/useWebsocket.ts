@@ -60,6 +60,7 @@ export default function useInfosFromSocket(userSetIp: string): [SocketState, str
       socket.on('disconnect', () => {
         setSocket();
         setSocketState('连接断开');
+        // eslint-disable-next-line no-console
         console.log('========== disconnected ws ===========');
       });
     }
