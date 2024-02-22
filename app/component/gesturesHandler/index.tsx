@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo, useState } from 'react';
+import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import { PanGestureHandler, State, TapGestureHandler } from 'react-native-gesture-handler';
 import { Direction } from '../../../constants/type';
 import { emitSocket } from '../../utils/socket';
@@ -29,6 +29,35 @@ function calculateDirection(angle: number): Direction {
     return 'left';
 }
 
+function getInertiaDistance({ finalVelocityX, finalVelocityY, timeStep } : { finalVelocityX?: number, finalVelocityY?: number, timeStep: number }) {
+    const decelerationRate = 0.9;
+    // 初始化速度为初始速度
+    const velocity = finalVelocityX || finalVelocityY || 0;
+    // 每次迭代，速度都会递减
+    function scroll(velocity: number, times: number) {
+        if (Math.abs(velocity) < 0.1 || times > 100) {
+            return;
+        }
+        // 计算当前速度对应的位移
+        const distance = velocity * timeStep * 0.1;
+
+        if (finalVelocityX) {
+            emitSocket('scrollMouse', { x: 0, y: distance });
+        } else if (finalVelocityY) {
+            emitSocket('scrollMouse', { x: distance, y: 0 });
+        }
+        // 根据减速率更新速度
+        velocity *= decelerationRate;
+
+        setTimeout(() => {
+            scroll(velocity, times + 1);
+        }, 10);
+    }
+
+    scroll(velocity, 1);
+}
+
+
 export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHandler, isDraging, setIsDraging }: {
     children: ReactNode,
     setIsCloseGestureHandler: (value: boolean) => void,
@@ -42,6 +71,8 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
       totalX: number;
       /** total moved distance in Y axis */
       totalY: number;
+      velocityX: number;
+      velocityY: number;
       /** last position */
       X: number;
       /** last position */
@@ -50,11 +81,16 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
     }>({
       totalX: 0,
       totalY: 0,
+      velocityX: 0,
+      velocityY: 0,
       X: 0,
       Y: 0,
       startFingers: 0,
     });
     const { width, height } = useMemo(() => Dimensions.get('window'), []);
+    const calculateDisByVelocitySensitivity = useCallback((velocity: number) => {
+        return sensitivity * Math.max(1, Math.abs(velocity / 500));
+    }, [sensitivity]);
 
     return <TapGestureHandler onHandlerStateChange={({ nativeEvent }) => {
         if (nativeEvent.state === State.END) {
@@ -72,8 +108,9 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 const first = startFingers === 0;
 
                 // ============= add speed velocity factor ==============
-                const moveDisFactorX = sensitivity * Math.max(1, Math.abs(nativeEvent.velocityX / 500));
-                const moveDisFactorY = sensitivity * Math.max(1, Math.abs(nativeEvent.velocityY / 500));
+                const moveDisFactorX = calculateDisByVelocitySensitivity(nativeEvent.velocityX)
+                ;
+                const moveDisFactorY = calculateDisByVelocitySensitivity(nativeEvent.velocityY);
 
                 let diffX = !first ? nativeEvent.absoluteX - positionDiff.X : 0;
                 let diffY = !first ? nativeEvent.absoluteY - positionDiff.Y : 0;
@@ -103,6 +140,8 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 setPositionDiff({
                     totalX: totalX + diffX,
                     totalY: totalY + diffY,
+                    velocityX: nativeEvent.velocityX,
+                    velocityY: nativeEvent.velocityY,
                     X: nativeEvent.absoluteX,
                     Y: nativeEvent.absoluteY,
                     startFingers: positionDiff.startFingers !== 0  ? positionDiff.startFingers : nativeEvent.numberOfPointers,
@@ -119,16 +158,22 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 if (positionDiff.startFingers === 3) {
                     const direction = calculateDirection(calculateAngle(positionDiff.totalX, positionDiff.totalY));
                     console.log(direction, positionDiff);
-                    
+
                     if (direction !== 'bottom') {
                         emitSocket('threeFingerSwitchWindow', direction);
                     } else {
                         setIsCloseGestureHandler(true);
                     }
+                } else if (positionDiff.startFingers === 2) {
+                    const isXBigger = Math.abs(positionDiff.velocityX) > Math.abs(positionDiff.velocityY);
+                    const finalVelocity = Math.max(positionDiff.velocityX, positionDiff.velocityY);
+                    getInertiaDistance({ finalVelocityX: isXBigger ? positionDiff.velocityX : 0, finalVelocityY: isXBigger ? 0 : positionDiff.velocityY, timeStep: calculateDisByVelocitySensitivity(finalVelocity) });
                 }
                 setPositionDiff({
                     totalX: 0,
                     totalY: 0,
+                    velocityX: 0,
+                    velocityY: 0,
                     X: 0,
                     Y: 0,
                     startFingers: 0,
