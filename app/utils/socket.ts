@@ -7,6 +7,14 @@ export function initSocket(newSocket: Socket) {
     socket = newSocket;
 }
 
+let throttleInfo: {
+    lastKey: string;
+    open: boolean;
+} = {
+    lastKey: '',
+    open: true,
+}
+
 export function emitSocket(...params:ResolveValue<{
     'threeFingerSwitchWindow': 'left' | 'right' | 'top' | 'add' | 'minus';
     'moveMouse': {
@@ -35,7 +43,19 @@ export function emitSocket(...params:ResolveValue<{
     };
 }>) {
     if (socket) {
-        socket.emit(...params);
+        if (throttleInfo.open || throttleInfo.lastKey !== params[0]) {
+            socket.emit(...params);
+            throttleInfo = {
+                open: false,
+                lastKey: params[0],
+            };
+            setTimeout(() => {
+                throttleInfo = {
+                    ...throttleInfo,
+                    open: true,
+                };
+            }, 10);
+        }
     } else {
         console.warn('socket is not set yet');
     }
