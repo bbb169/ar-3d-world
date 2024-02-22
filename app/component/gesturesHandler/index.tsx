@@ -35,7 +35,7 @@ function getInertiaDistance({ finalVelocityX, finalVelocityY, timeStep } : { fin
     const velocity = finalVelocityX || finalVelocityY || 0;
     // 每次迭代，速度都会递减
     function scroll(velocity: number, times: number) {
-        if (Math.abs(velocity) < 0.1 || times > 100) {
+        if (Math.abs(velocity) < 0.1 || times > 50) {
             return;
         }
         // 计算当前速度对应的位移
@@ -51,7 +51,7 @@ function getInertiaDistance({ finalVelocityX, finalVelocityY, timeStep } : { fin
 
         setTimeout(() => {
             scroll(velocity, times + 1);
-        }, 10);
+        }, 20);
     }
 
     scroll(velocity, 1);
