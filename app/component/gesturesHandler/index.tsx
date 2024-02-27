@@ -29,13 +29,15 @@ function calculateDirection(angle: number): Direction {
     return 'left';
 }
 
+let newMoveStatrt = false;
+
 function getInertiaDistance({ finalVelocityX, finalVelocityY, timeStep } : { finalVelocityX?: number, finalVelocityY?: number, timeStep: number }) {
     const decelerationRate = 0.9;
     // 初始化速度为初始速度
     const velocity = finalVelocityX || finalVelocityY || 0;
     // 每次迭代，速度都会递减
     function scroll(velocity: number, times: number) {
-        if (Math.abs(velocity) < 0.1 || times > 50) {
+        if (Math.abs(velocity) < 0.1 || times > 50 || newMoveStatrt) {
             return;
         }
         // 计算当前速度对应的位移
@@ -107,6 +109,9 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 const { totalX, totalY, startFingers} = positionDiff;
                 const first = startFingers === 0;
 
+                if (first) {
+                    newMoveStatrt = true;
+                }
                 // ============= add speed velocity factor ==============
                 const moveDisFactorX = calculateDisByVelocitySensitivity(nativeEvent.velocityX)
                 ;
@@ -167,6 +172,8 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 } else if (positionDiff.startFingers === 2) {
                     const isXBigger = Math.abs(positionDiff.velocityX) > Math.abs(positionDiff.velocityY);
                     const finalVelocity = Math.max(positionDiff.velocityX, positionDiff.velocityY);
+
+                    newMoveStatrt = false;
                     getInertiaDistance({ finalVelocityX: isXBigger ? positionDiff.velocityX : 0, finalVelocityY: isXBigger ? 0 : positionDiff.velocityY, timeStep: calculateDisByVelocitySensitivity(finalVelocity) });
                 }
                 setPositionDiff({
