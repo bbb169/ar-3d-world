@@ -48,6 +48,8 @@ export default function useInfosFromSocket(userSetIp: string): [SocketState, str
         }
       });
     } else if (!socket && wifiIpAddress) {
+      console.log('rtyr', socket);
+      
       setSocket(io(`http://${wifiIpAddress}:${3000}`));
     } else if (socket && wifiIpAddress) {
       initSocket(socket);
@@ -58,7 +60,8 @@ export default function useInfosFromSocket(userSetIp: string): [SocketState, str
       });
 
       socket.on('disconnect', () => {
-        setSocket();
+        // make it not try to connect again
+        setSocket('not try' as unknown as Socket);
         setSocketState('连接断开');
         // eslint-disable-next-line no-console
         console.log('========== disconnected ws ===========');
