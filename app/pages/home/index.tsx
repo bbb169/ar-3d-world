@@ -59,7 +59,10 @@ export default function HomePage(): React.JSX.Element {
             }
             return false;
           })) {
-            setUserSetIp(val.join('.'));
+            setUserSetIp('');
+            setTimeout(() => {
+              setUserSetIp(val.join('.'));
+            }, 0);
           }
         }} />
         <IconButton buttonProps={{
