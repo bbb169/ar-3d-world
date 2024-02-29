@@ -7,15 +7,18 @@ import device from 'expo-device';
 import { useDeviceIpAddress } from './useDeviceIpAddress';
 
 type SocketState = '未连接' | '已连接' | '连接断开';
+const BE_DISCONNECTED = 1;
 
 export default function useInfosFromSocket(userSetIp: string): [SocketState, string] {
-  const [socket, setSocket] = useState<Socket | void>();
+  const [socket, setSocket] = useState<
+    Socket | void | typeof BE_DISCONNECTED
+  >();
   const [wifiIpAddress, setWifiIpAddress] = useState<string>('');
   const [socketState, setSocketState] = useState<SocketState>('未连接');
   const [deviceIp] = useDeviceIpAddress();
 
   useEffect(() => {
-    if (socket && deviceIp) {
+    if (socket && deviceIp && socket !== BE_DISCONNECTED) {
       const sendDeviceInfo = (times = 0) => {
         if (times < 10 && socket?.connected) {
           emitSocket('deviceInfo', {
@@ -41,6 +44,10 @@ export default function useInfosFromSocket(userSetIp: string): [SocketState, str
   }, [userSetIp]);
 
   useEffect(() => {
+    if (socket === BE_DISCONNECTED) {
+      return;
+    }
+
     if (!wifiIpAddress) {
       NetInfo.fetch().then((connectionInfo) => {
         if (connectionInfo.type === 'wifi' && connectionInfo.details) {
@@ -48,8 +55,6 @@ export default function useInfosFromSocket(userSetIp: string): [SocketState, str
         }
       });
     } else if (!socket && wifiIpAddress) {
-      console.log('rtyr', socket);
-      
       setSocket(io(`http://${wifiIpAddress}:${3000}`));
     } else if (socket && wifiIpAddress) {
       initSocket(socket);
@@ -59,9 +64,12 @@ export default function useInfosFromSocket(userSetIp: string): [SocketState, str
         storeData('ipAddress', wifiIpAddress);
       });
 
+      socket.on('dis-connect-device', () => {
+        setSocket(BE_DISCONNECTED);
+      });
+
       socket.on('disconnect', () => {
         // make it not try to connect again
-        setSocket('not try' as unknown as Socket);
         setSocketState('连接断开');
         // eslint-disable-next-line no-console
         console.log('========== disconnected ws ===========');
