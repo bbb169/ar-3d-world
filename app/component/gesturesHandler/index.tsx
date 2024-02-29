@@ -132,8 +132,8 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 if (positionDiff.startFingers === 1 && nativeEvent.numberOfPointers === 1) {
                     emitSocket('moveMouse', { left: diffY * moveDisFactorY, top: -diffX * moveDisFactorX, isDraging });
                 } else if (positionDiff.startFingers === 2 && nativeEvent.numberOfPointers === 2) {
-                    const isXBigger = Math.abs(diffY) > Math.abs(diffX);
-                    emitSocket('scrollMouse', { x: isXBigger ? diffY * moveDisFactorY : 0, y: !isXBigger ? diffX * moveDisFactorX : 0 });
+                    const isYBigger = Math.abs(diffY) > Math.abs(diffX);
+                    emitSocket('scrollMouse', { x: isYBigger ? diffY * moveDisFactorY : 0, y: !isYBigger ? -diffX * moveDisFactorX : 0 });
                 } else if (positionDiff.startFingers === 0 && nativeEvent.numberOfPointers === 3) {
                     Vibration.vibrate([0, 50]);
                 }
