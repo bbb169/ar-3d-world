@@ -54,7 +54,7 @@ export function emitSocket(...params:ResolveValue<{
                     ...throttleInfo,
                     open: true,
                 };
-            }, 10);
+            }, 5);
         }
     } else {
         console.warn('socket is not set yet');
