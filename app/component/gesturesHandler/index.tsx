@@ -59,6 +59,18 @@ function getInertiaDistance({ finalVelocityX, finalVelocityY, timeStep } : { fin
     scroll(velocity, 1);
 }
 
+function limitLessMoveDis(value: number) {
+    const lessDiss = 0.7;
+
+    if (value === 0) {
+        return 0;
+    }
+
+    if (value > 0) {
+        return Math.max(lessDiss, value);
+    }
+        return Math.min(-lessDiss, value);
+}
 
 export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHandler, isDraging, setIsDraging }: {
     children: ReactNode,
@@ -123,17 +135,17 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 // ==================== handle distance in low speed ===========
                 const isHighSpeedMovement = (Math.abs(nativeEvent.velocityX) > 150 || Math.abs(nativeEvent.velocityY) > 150);
 
-                if (diffX && diffX / diffY < 0.1 && !isHighSpeedMovement) {
+                if (diffX && (Math.abs(diffX) / Math.abs(diffY) < 0.1) && !isHighSpeedMovement) {
                     diffX = 0;
-                } else if (diffY && diffY / diffX < 0.1 && !isHighSpeedMovement) {
+                } else if (diffY && (Math.abs(diffY) / Math.abs(diffX) < 0.1) && !isHighSpeedMovement) {
                     diffY = 0;
                 }
 
                 if (positionDiff.startFingers === 1 && nativeEvent.numberOfPointers === 1) {
-                    emitSocket('moveMouse', { left: diffY * moveDisFactorY, top: -diffX * moveDisFactorX, isDraging });
+                    emitSocket('moveMouse', { left: limitLessMoveDis(diffY * moveDisFactorY), top: -limitLessMoveDis(diffX * moveDisFactorX), isDraging });
                 } else if (positionDiff.startFingers === 2 && nativeEvent.numberOfPointers === 2) {
-                    const isYBigger = Math.abs(diffY) > Math.abs(diffX);
-                    emitSocket('scrollMouse', { x: isYBigger ? diffY * moveDisFactorY : 0, y: !isYBigger ? -diffX * moveDisFactorX : 0 });
+                    const isYBigger = Math.abs(totalY) > Math.abs(totalX);
+                    emitSocket('scrollMouse', { x: isYBigger ? diffY * moveDisFactorY : 0, y: !isYBigger ? diffX * moveDisFactorX : 0 });
                 } else if (positionDiff.startFingers === 0 && nativeEvent.numberOfPointers === 3) {
                     Vibration.vibrate([0, 50]);
                 }
