@@ -41,12 +41,12 @@ function getInertiaDistance({ finalVelocityX, finalVelocityY, timeStep } : { fin
             return;
         }
         // 计算当前速度对应的位移
-        const distance = velocity * timeStep * 0.1;
+        const distance = velocity * timeStep * 0.3;
 
         if (finalVelocityX) {
             emitSocket('scrollMouse', { x: 0, y: distance });
         } else if (finalVelocityY) {
-            emitSocket('scrollMouse', { x: distance, y: 0 });
+            emitSocket('scrollMouse', { x: -distance, y: 0 });
         }
         // 根据减速率更新速度
         velocity *= decelerationRate;
@@ -56,7 +56,15 @@ function getInertiaDistance({ finalVelocityX, finalVelocityY, timeStep } : { fin
         }, 20);
     }
 
-    scroll(velocity, 1);
+    const absoluteValue = Math.abs(velocity);
+
+    if (absoluteValue > 200) {
+        if (velocity > 0) {
+            scroll(Math.floor(Math.sqrt(absoluteValue)), 1);
+        } else {
+            scroll(-Math.floor(Math.sqrt(absoluteValue)), 1);
+        }
+    }
 }
 
 function limitLessMoveDis(value: number) {
