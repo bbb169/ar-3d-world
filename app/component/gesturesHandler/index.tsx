@@ -153,7 +153,17 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                     emitSocket('moveMouse', { left: limitLessMoveDis(diffY * moveDisFactorY), top: -limitLessMoveDis(diffX * moveDisFactorX), isDraging });
                 } else if (positionDiff.startFingers === 2 && nativeEvent.numberOfPointers === 2) {
                     const isYBigger = Math.abs(totalY) > Math.abs(totalX);
-                    emitSocket('scrollMouse', { x: isYBigger ? diffY * moveDisFactorY : 0, y: !isYBigger ? diffX * moveDisFactorX : 0 });
+                    console.log(nativeEvent, 'scrollMouse');
+                    if (isYBigger) {
+                        if (positionDiff.velocityY === 0) {
+                            return;
+                        }
+                    } else {
+                        if (positionDiff.velocityX === 0) {
+                            return;
+                        }
+                    }
+                    emitSocket('scrollMouse', { x: isYBigger ? (-diffY * moveDisFactorY) / 2 : 0, y: !isYBigger ? (diffX * moveDisFactorX) / 2 : 0 });
                 } else if (positionDiff.startFingers === 0 && nativeEvent.numberOfPointers === 3) {
                     Vibration.vibrate([0, 50]);
                 }
