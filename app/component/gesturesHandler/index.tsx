@@ -153,7 +153,7 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                     emitSocket('moveMouse', { left: limitLessMoveDis(diffY * moveDisFactorY), top: -limitLessMoveDis(diffX * moveDisFactorX), isDraging });
                 } else if (positionDiff.startFingers === 2 && nativeEvent.numberOfPointers === 2) {
                     const isYBigger = Math.abs(totalY) > Math.abs(totalX);
-                    console.log(nativeEvent, 'scrollMouse');
+
                     if (isYBigger) {
                         if (positionDiff.velocityY === 0) {
                             return;
@@ -192,7 +192,7 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                 // ============  threeFingerSwitchWindow ================
                 if (positionDiff.startFingers === 3) {
                     const direction = calculateDirection(calculateAngle(positionDiff.totalX, positionDiff.totalY));
-                    console.log(direction, positionDiff);
+
 
                     if (direction !== 'bottom') {
                         emitSocket('threeFingerSwitchWindow', direction);
