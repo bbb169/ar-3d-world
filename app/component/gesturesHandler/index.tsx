@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
-import { PanGestureHandler, PinchGestureHandler, State, TapGestureHandler } from 'react-native-gesture-handler';
+import { GestureEventPayload, PanGestureHandler, PanGestureHandlerEventPayload, PinchGestureHandler, State, TapGestureHandler } from 'react-native-gesture-handler';
 import { Direction } from '../../../constants/type';
 import { emitSocket } from '../../utils/socket';
 import { Dimensions, Vibration } from 'react-native';
@@ -114,10 +114,106 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
         return sensitivity * Math.max(1, Math.abs(velocity / 500));
     }, [sensitivity]);
 
-    return <PinchGestureHandler
-    onGestureEvent={this.onPinchGestureEvent}
-    onHandlerStateChange={this.onPinchHandlerStateChange}>
-            <TapGestureHandler onHandlerStateChange={({ nativeEvent }) => {
+    const handleFingerMove = ({ nativeEvent } : { nativeEvent: Readonly<GestureEventPayload & PanGestureHandlerEventPayload> }) => {
+        const calculatePosition = () => {
+            const { totalX, totalY, startFingers} = positionDiff;
+            const first = startFingers === 0;
+
+            if (first) {
+                newMoveStatrt = true;
+            }
+            // ============= add speed velocity factor ==============
+            const moveDisFactorX = calculateDisByVelocitySensitivity(nativeEvent.velocityX)
+            ;
+            const moveDisFactorY = calculateDisByVelocitySensitivity(nativeEvent.velocityY);
+
+            let diffX = !first ? nativeEvent.absoluteX - positionDiff.X : 0;
+            let diffY = !first ? nativeEvent.absoluteY - positionDiff.Y : 0;
+
+            // ==================== handle distance in low speed ===========
+            const isHighSpeedMovement = (Math.abs(nativeEvent.velocityX) > 150 || Math.abs(nativeEvent.velocityY) > 150);
+
+            if (diffX && (Math.abs(diffX) / Math.abs(diffY) < 0.1) && !isHighSpeedMovement) {
+                diffX = 0;
+            } else if (diffY && (Math.abs(diffY) / Math.abs(diffX) < 0.1) && !isHighSpeedMovement) {
+                diffY = 0;
+            }
+
+            if (positionDiff.startFingers === 1 && nativeEvent.numberOfPointers === 1) {
+                emitSocket('moveMouse', { left: limitLessMoveDis(diffY * moveDisFactorY), top: -limitLessMoveDis(diffX * moveDisFactorX), isDraging });
+            } else if (positionDiff.startFingers === 2 && nativeEvent.numberOfPointers === 2) {
+                const isYBigger = Math.abs(totalY) > Math.abs(totalX);
+
+                if (isYBigger) {
+                    if (positionDiff.velocityY === 0) {
+                        return;
+                    }
+                } else {
+                    if (positionDiff.velocityX === 0) {
+                        return;
+                    }
+                }
+                emitSocket('scrollMouse', { x: isYBigger ? (-diffY * moveDisFactorY) / 2 : 0, y: !isYBigger ? (diffX * moveDisFactorX) / 2 : 0 });
+            } else if (positionDiff.startFingers === 0 && nativeEvent.numberOfPointers === 3) {
+                Vibration.vibrate([0, 50]);
+            }
+
+            if (positionDiff.startFingers !== 0 && positionDiff.startFingers !== nativeEvent.numberOfPointers) {
+                return;
+            }
+
+            setPositionDiff({
+                totalX: totalX + diffX,
+                totalY: totalY + diffY,
+                velocityX: nativeEvent.velocityX,
+                velocityY: nativeEvent.velocityY,
+                X: nativeEvent.absoluteX,
+                Y: nativeEvent.absoluteY,
+                startFingers: positionDiff.startFingers !== 0  ? positionDiff.startFingers : nativeEvent.numberOfPointers,
+            });
+        };
+
+        if (nativeEvent.state === State.ACTIVE) {
+            calculatePosition();
+        }
+    };
+
+    const handleFingerMoveStateChange = ({ nativeEvent } : { nativeEvent: Readonly<GestureEventPayload & PanGestureHandlerEventPayload> }) => {
+        if (nativeEvent.state === State.END) {
+            // ============  threeFingerSwitchWindow ================
+            if (positionDiff.startFingers === 3) {
+                const direction = calculateDirection(calculateAngle(positionDiff.totalX, positionDiff.totalY));
+
+
+                if (direction !== 'bottom') {
+                    emitSocket('threeFingerSwitchWindow', direction);
+                } else {
+                    setIsCloseGestureHandler(true);
+                }
+            } else if (positionDiff.startFingers === 2) {
+                const isXBigger = Math.abs(positionDiff.velocityX) > Math.abs(positionDiff.velocityY);
+                const finalVelocity = Math.max(positionDiff.velocityX, positionDiff.velocityY);
+
+                newMoveStatrt = false;
+                getInertiaDistance({ finalVelocityX: isXBigger ? positionDiff.velocityX : 0, finalVelocityY: isXBigger ? 0 : positionDiff.velocityY, timeStep: calculateDisByVelocitySensitivity(finalVelocity) });
+            }
+            setPositionDiff({
+                totalX: 0,
+                totalY: 0,
+                velocityX: 0,
+                velocityY: 0,
+                X: 0,
+                Y: 0,
+                startFingers: 0,
+            });
+            if (isDraging) {
+                emitSocket('mouseToggle', { down: 'up' });
+                setIsDraging(false);
+            }
+        }
+    };
+
+    return <TapGestureHandler onHandlerStateChange={({ nativeEvent }) => {
             if (nativeEvent.state === State.END) {
                 const rightClick = ((nativeEvent.absoluteX / width) < 0.20) && ((nativeEvent.absoluteY / height) > 0.80);
                 emitSocket('mouseClick', { button: rightClick ? 'right' : 'left' });
@@ -128,107 +224,12 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                     emitSocket('mouseClick', { double: true });
                 }
             }} numberOfTaps={2}>
-                    <PanGestureHandler
-                    onGestureEvent={({ nativeEvent }) => {
-                        const calculatePosition = () => {
-                            const { totalX, totalY, startFingers} = positionDiff;
-                            const first = startFingers === 0;
-
-                            if (first) {
-                                newMoveStatrt = true;
-                            }
-                            // ============= add speed velocity factor ==============
-                            const moveDisFactorX = calculateDisByVelocitySensitivity(nativeEvent.velocityX)
-                            ;
-                            const moveDisFactorY = calculateDisByVelocitySensitivity(nativeEvent.velocityY);
-
-                            let diffX = !first ? nativeEvent.absoluteX - positionDiff.X : 0;
-                            let diffY = !first ? nativeEvent.absoluteY - positionDiff.Y : 0;
-
-                            // ==================== handle distance in low speed ===========
-                            const isHighSpeedMovement = (Math.abs(nativeEvent.velocityX) > 150 || Math.abs(nativeEvent.velocityY) > 150);
-
-                            if (diffX && (Math.abs(diffX) / Math.abs(diffY) < 0.1) && !isHighSpeedMovement) {
-                                diffX = 0;
-                            } else if (diffY && (Math.abs(diffY) / Math.abs(diffX) < 0.1) && !isHighSpeedMovement) {
-                                diffY = 0;
-                            }
-
-                            if (positionDiff.startFingers === 1 && nativeEvent.numberOfPointers === 1) {
-                                emitSocket('moveMouse', { left: limitLessMoveDis(diffY * moveDisFactorY), top: -limitLessMoveDis(diffX * moveDisFactorX), isDraging });
-                            } else if (positionDiff.startFingers === 2 && nativeEvent.numberOfPointers === 2) {
-                                const isYBigger = Math.abs(totalY) > Math.abs(totalX);
-
-                                if (isYBigger) {
-                                    if (positionDiff.velocityY === 0) {
-                                        return;
-                                    }
-                                } else {
-                                    if (positionDiff.velocityX === 0) {
-                                        return;
-                                    }
-                                }
-                                emitSocket('scrollMouse', { x: isYBigger ? (-diffY * moveDisFactorY) / 2 : 0, y: !isYBigger ? (diffX * moveDisFactorX) / 2 : 0 });
-                            } else if (positionDiff.startFingers === 0 && nativeEvent.numberOfPointers === 3) {
-                                Vibration.vibrate([0, 50]);
-                            }
-
-                            if (positionDiff.startFingers !== 0 && positionDiff.startFingers !== nativeEvent.numberOfPointers) {
-                                return;
-                            }
-
-                            setPositionDiff({
-                                totalX: totalX + diffX,
-                                totalY: totalY + diffY,
-                                velocityX: nativeEvent.velocityX,
-                                velocityY: nativeEvent.velocityY,
-                                X: nativeEvent.absoluteX,
-                                Y: nativeEvent.absoluteY,
-                                startFingers: positionDiff.startFingers !== 0  ? positionDiff.startFingers : nativeEvent.numberOfPointers,
-                            });
-                        };
-
-                        if (nativeEvent.state === State.ACTIVE) {
-                            calculatePosition();
-                        }
-                    }}
-                    onHandlerStateChange={({ nativeEvent }) => {
-                        if (nativeEvent.state === State.END) {
-                            // ============  threeFingerSwitchWindow ================
-                            if (positionDiff.startFingers === 3) {
-                                const direction = calculateDirection(calculateAngle(positionDiff.totalX, positionDiff.totalY));
-
-
-                                if (direction !== 'bottom') {
-                                    emitSocket('threeFingerSwitchWindow', direction);
-                                } else {
-                                    setIsCloseGestureHandler(true);
-                                }
-                            } else if (positionDiff.startFingers === 2) {
-                                const isXBigger = Math.abs(positionDiff.velocityX) > Math.abs(positionDiff.velocityY);
-                                const finalVelocity = Math.max(positionDiff.velocityX, positionDiff.velocityY);
-
-                                newMoveStatrt = false;
-                                getInertiaDistance({ finalVelocityX: isXBigger ? positionDiff.velocityX : 0, finalVelocityY: isXBigger ? 0 : positionDiff.velocityY, timeStep: calculateDisByVelocitySensitivity(finalVelocity) });
-                            }
-                            setPositionDiff({
-                                totalX: 0,
-                                totalY: 0,
-                                velocityX: 0,
-                                velocityY: 0,
-                                X: 0,
-                                Y: 0,
-                                startFingers: 0,
-                            });
-                            if (isDraging) {
-                                emitSocket('mouseToggle', { down: 'up' });
-                                setIsDraging(false);
-                            }
-                        }
-                    }}
-                >{children}
+                <PanGestureHandler
+                    onGestureEvent={handleFingerMove}
+                    onHandlerStateChange={handleFingerMoveStateChange}
+                >
+                    {children}
                 </PanGestureHandler>
             </TapGestureHandler>
-        </TapGestureHandler>
-    </PinchGestureHandler>;
+        </TapGestureHandler>;
 }
