@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
-import { GestureEventPayload, PanGestureHandler, PanGestureHandlerEventPayload, PinchGestureHandler, State, TapGestureHandler } from 'react-native-gesture-handler';
+import { GestureEventPayload, PanGestureHandler, PanGestureHandlerEventPayload, State, TapGestureHandler } from 'react-native-gesture-handler';
 import { Direction } from '../../../constants/type';
 import { emitSocket } from '../../utils/socket';
 import { Dimensions, Vibration } from 'react-native';
@@ -33,8 +33,6 @@ let newMoveStatrt = false;
 
 function getInertiaDistance({ finalVelocityX, finalVelocityY, timeStep } : { finalVelocityX?: number, finalVelocityY?: number, timeStep: number }) {
     const decelerationRate = 0.9;
-    // 初始化速度为初始速度
-    const velocity = finalVelocityX || finalVelocityY || 0;
     // 每次迭代，速度都会递减
     function scroll(velocity: number, times: number) {
         if (Math.abs(velocity) < 0.1 || times > 50 || newMoveStatrt) {
@@ -55,6 +53,8 @@ function getInertiaDistance({ finalVelocityX, finalVelocityY, timeStep } : { fin
             scroll(velocity, times + 1);
         }, 20);
     }
+    // 初始化速度为初始速度
+    const velocity = finalVelocityX || finalVelocityY || 0;
 
     const absoluteValue = Math.abs(velocity);
 

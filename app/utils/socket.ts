@@ -13,7 +13,7 @@ let throttleInfo: {
 } = {
     lastKey: '',
     open: true,
-}
+};
 
 export function emitSocket(...params:ResolveValue<{
     'threeFingerSwitchWindow': 'left' | 'right' | 'top' | 'add' | 'minus';

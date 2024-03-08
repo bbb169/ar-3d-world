@@ -85,8 +85,6 @@ module.exports = {
     'no-else-return': ['error'],
     // Place each method call or property access on a new line when chaining multiple method calls
     'newline-per-chained-call': ['error', { ignoreChainWithDepth: 3 }],
-    // Disallow variable names with a length less than 2 (with exceptions)
-    'id-length': ['warn', { exceptions: ['x', 'y', 'z', 'i', 'j', 'e'] }],
     // Disallow padding within block scopes
     'padded-blocks': [1, 'never'],
     // Disallow multiple consecutive empty lines
