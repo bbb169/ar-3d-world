@@ -153,6 +153,7 @@ export function GesturesHandler({ children, sensitivity = 1, setIsCloseGestureHa
                         return;
                     }
                 }
+
                 emitSocket('scrollMouse', { x: isYBigger ? (-diffY * moveDisFactorY) / 2 : 0, y: !isYBigger ? (diffX * moveDisFactorX) / 2 : 0 });
             } else if (positionDiff.startFingers === 0 && nativeEvent.numberOfPointers === 3) {
                 Vibration.vibrate([0, 50]);
